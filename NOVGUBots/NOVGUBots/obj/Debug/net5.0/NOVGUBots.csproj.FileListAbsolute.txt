@@ -1,0 +1,5 @@
+D:\GitHub\NOVGU_Bots\NOVGUBots\NOVGUBots\obj\Debug\net5.0\NOVGUBots.csprojAssemblyReference.cache
+D:\GitHub\NOVGU_Bots\NOVGUBots\NOVGUBots\obj\Debug\net5.0\NOVGUBots.GeneratedMSBuildEditorConfig.editorconfig
+D:\GitHub\NOVGU_Bots\NOVGUBots\NOVGUBots\obj\Debug\net5.0\NOVGUBots.AssemblyInfoInputs.cache
+D:\GitHub\NOVGU_Bots\NOVGUBots\NOVGUBots\obj\Debug\net5.0\NOVGUBots.AssemblyInfo.cs
+D:\GitHub\NOVGU_Bots\NOVGUBots\NOVGUBots\obj\Debug\net5.0\NOVGUBots.csproj.CoreCompileInputs.cache
