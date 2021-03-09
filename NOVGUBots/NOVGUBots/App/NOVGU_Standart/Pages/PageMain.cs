@@ -11,29 +11,14 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
 {
     public partial class AppNovgu
     {
-        public class PageMain : IPage
+        public class PageMain : Page
         {
-            public KitButton GetKeyboardButtons(ObjectDataMessageInBot inBot)
+            public override void EventInMessage(ObjectDataMessageInBot inBot)
             {
                 throw new NotImplementedException();
             }
 
-            public void InMessage(ObjectDataMessageInBot inBot)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void LoadPageStore(ObjectDataMessageInBot inBot)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void ResetLastMessenge(ObjectDataMessageInBot inBot)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void SetPage(ObjectDataMessageInBot inBot)
+            public override void ResetLastMessenge(ObjectDataMessageInBot inBot)
             {
                 throw new NotImplementedException();
             }

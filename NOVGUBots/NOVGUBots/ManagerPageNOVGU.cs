@@ -6,8 +6,8 @@ namespace NOVGUBots
 {
     public static class ManagerPageNOVGU
     {
-        private static List<IGetButtonsPage> buttonsPages = new List<IGetButtonsPage>();
-        private static List<IGetButtonsSetting> buttonsSettings = new List<IGetButtonsSetting>();
+        private static readonly List<IGetButtonsPage> buttonsPages = new();
+        private static readonly List<IGetButtonsSetting> buttonsSettings = new();
 
         public static void AddApp(object app)
         {

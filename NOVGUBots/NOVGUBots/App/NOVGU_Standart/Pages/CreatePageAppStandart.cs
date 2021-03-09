@@ -14,29 +14,23 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
         public string GetNameApp() => NameApp;
         public object GetPage(string name, IBot.BotTypes? botType = null, string keyBot = null)
         {
-            switch (name)
+            return name switch
             {
-                case NamePage_Main:
-                    return new PageMain();
-                case NamePage_Setting:
-                    return new PageSetting();
-                case NamePage_StartNewUser:
-                    return new PageStart();
-            }
-            return null;
+                NamePage_Main => new PageMain(),
+                NamePage_Setting => new PageSetting(),
+                NamePage_StartNewUser => new PageStart(),
+                _ => null,
+            };
         }
         public Type GetTypePage(string name, IBot.BotTypes? botType = null, string keyBot = null)
         {
-            switch (name)
+            return name switch
             {
-                case NamePage_Main:
-                    return typeof(PageMain);
-                case NamePage_Setting:
-                    return typeof(PageSetting);
-                case NamePage_StartNewUser:
-                    return typeof(PageStart);
-            }
-            return null;
+                NamePage_Main => typeof(PageMain),
+                NamePage_Setting => typeof(PageSetting),
+                NamePage_StartNewUser => typeof(PageStart),
+                _ => null,
+            };
         }
     }
 }

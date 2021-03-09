@@ -23,37 +23,39 @@ using BotsCore.User;
 using Newtonsoft.Json;
 using NOVGUBots.App.NOVGU_Standart.Pages;
 using NOVGUBots.Moduls;
-using NOVGUBots.Moduls.NOVGU_SiteData;
 using NOVGUBots.SettingCore;
+using static BotsCore.Bots.Model.ObjectDataMessageSend;
 
 namespace NOVGUBots
 {
     static class Program
     {
         private const string SettingPath = @"Settings\GlobalSetting.txt";
+#pragma warning disable IDE0052 // Удалить непрочитанные закрытые члены
         private static ModelUpdateTablesInternet standartTables;
+#pragma warning restore IDE0052 // Удалить непрочитанные закрытые члены
         private static readonly object[] apps = new object[]
         {
             new CreatePageAppStandart()
         };
         public static void Main()
         {
-            Parser.Start();
-            return;
+            // Parser.Start();
+            // return;
             // Получение главного файла настроек
-            ObjectSettingCostum settingData = new ObjectSettingCostum(SettingPath);
+            ObjectSettingCostum settingData = new(SettingPath);
             // Вычлинение некоторых настроек в поля
             NOVGUSetting.Start(settingData);
-            // Применение настроек для менеджера страниц
-            ManagerPage.Start(new SettingManagerPage(NOVGUSetting.objectSetting));
             // Инцилизация базы пользователей
             ManagerUser.Start(new ObjectSettingCostum(NOVGUSetting.objectSetting.GetValue("ManagerUser_PathFileSetting")));
             // Загрузка базовых таблиц
             LoadStandartTables();
-            // Подгрузка пвсех приложений
+            // Подгрузка всех приложений
             LoadApp();
             // Инцилизация ботов
             LoadBots();
+            // Применение настроек для менеджера страниц
+            ManagerPage.Start(new SettingManagerPage());
             // Вечное ожидание чтоб программа не закрылась
             System.Diagnostics.Process.GetCurrentProcess().WaitForExit();
         }
@@ -64,23 +66,11 @@ namespace NOVGUBots
         }
         private static void LoadStandartTables()
         {
-            (string type, string name)[] tablesInfo = JsonConvert.DeserializeObject<(string type, string name)[]>(NOVGUSetting.objectSetting.GetValue("TablesConnect_TablesListInfo"));
-            ITable[] tables = new ITable[tablesInfo.Length];
-            for (int i = 0; i < tablesInfo.Length; i++)
+            ITable[] tables = new ITable[]
             {
-                switch (tablesInfo[i].type)
-                {
-                    case "String":
-                        tables[i] = new ModelTableString(tablesInfo[i].name);
-                        break;
-                    case "Text":
-                        tables[i] = new ModelTableText(tablesInfo[i].name);
-                        break;
-                    case "Object":
-                        tables[i] = new ModelTableUniversal<object>(tablesInfo[i].name);
-                        break;
-                }
-            }
+                new ModelTableText("MainTextNOVGU", NOVGUSetting.langs),
+                new ModelTableUniversal<Media[]>("MainMediaNOVGU")
+            };
             standartTables = new ModelUpdateTablesInternet
                 (
                 NOVGUSetting.objectSetting.GetValue("TablesConnect_HostTablesUrl"),
@@ -102,7 +92,6 @@ namespace NOVGUBots
                         break;
                 }
             }
-            ManagerBots.StartBots();
         }
     }
 }
