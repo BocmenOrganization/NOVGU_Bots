@@ -74,4 +74,5 @@ ManagerUser_PathFileSetting=>Settings\SettingUser.txt;
 
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Bots Telegram ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-BotsTelegram_ListBots=>[{"Item1":"Telegram","Item2":"795697047:AAFYXv9a0Shac36NQPinZpBVS9J_zhjnl4c"}];
+
+BotsTelegram_ListBots=>[{"Item1":"Telegram","Item2":"1657650627:AAGamT-BhL3vD8mFLN7vZ8rpRwAl6QuMw2k"}];

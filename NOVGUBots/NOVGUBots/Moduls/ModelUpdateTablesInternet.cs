@@ -18,20 +18,22 @@ namespace NOVGUBots.Moduls
         private readonly string host;
         private readonly ITable[] tables;
         private ModelTableInfo[] infosTable;
-        private Timer timerUpdate;
-        private string Password;
+        private readonly Timer timerUpdate;
+        private readonly string Password;
 
         public ModelUpdateTablesInternet(string host, ulong timeUpdate, string Password = null, params ITable[] tables)
         {
-            if (tables == null || tables.Count() == 0)
+            if (tables == null || tables.Length == 0)
                 throw new BotsCore.Model.Exception("Не удалось создать обьект обновления страниц из сети из за отсутствия страниц");
             this.host = host;
             this.tables = tables;
             this.Password = Password;
             LoadAllTablesData();
-            timerUpdate = new Timer();
-            timerUpdate.Interval = (double)timeUpdate;
-            timerUpdate.AutoReset = false;
+            timerUpdate = new Timer
+            {
+                Interval = (double)timeUpdate,
+                AutoReset = false
+            };
             timerUpdate.Elapsed += (e, c) => { LoadAllTablesData(); timerUpdate.Start(); };
             timerUpdate.Start();
         }
@@ -58,7 +60,7 @@ namespace NOVGUBots.Moduls
                 return tables.ToList();
             if (newModelTableInfos == null)
                 throw new BotsCore.Model.Exception("Не удалось узнать список обновляемых таблиц");
-            List<ITable> resul = new List<ITable>();
+            List<ITable> resul = new();
             foreach (var InfoTable in newModelTableInfos)
             {
                 var tableInfo = infosTable.FirstOrDefault(x => x.TableName == InfoTable.TableName);
@@ -100,12 +102,10 @@ namespace NOVGUBots.Moduls
         /// </summary>
         private string DownloadText(string Url)
         {
-            using (WebClient client = new WebClient())
-            {
-                client.Headers.Add("Password", Password);
-                client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0");
-                return client.DownloadString(Url);
-            }
+            using WebClient client = new();
+            client.Headers.Add("Password", Password);
+            client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0");
+            return client.DownloadString(Url);
         }
     }
 }
