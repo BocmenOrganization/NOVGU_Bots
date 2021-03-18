@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData.Interface
 {
-    public interface IUpdated : IGetId, ITranslate
+    public interface IUpdated : IGetId, ITranslatable
     {
         /// <summary>
         /// Обновить обьект в соответствии с входными данными
@@ -31,7 +31,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Interface
         public static (bool stateUpdated, IEnumerable<object> newData) Update(IEnumerable<object> newData, IEnumerable<object> oldData, ref List<object> updatedElem)
         {
             bool resul = false;
-            List<object> NewList = new List<object>();
+            List<object> NewList = new();
             List<object> ThisList = oldData.ToList();
             if (updatedElem == default)
                 updatedElem = new List<object>();

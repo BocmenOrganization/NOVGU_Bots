@@ -53,7 +53,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             if (html == default)
                 return default;
             int id = -1;
-            HtmlDocument htmlDocumentCourse = new HtmlDocument();
+            HtmlDocument htmlDocumentCourse = new();
             htmlDocumentCourse.LoadHtml(html);
             HtmlNodeCollection nodesCourse = htmlDocumentCourse.DocumentNode.SelectNodes("//tr[2]//td");
             (string course, List<(string nameGroup, string UrlSchedule)>)[] dataResul = ParseCollege(dopHtml)?.Item2?.Select(x => (x.course, x.Item2?.ToList())).ToArray();
@@ -95,7 +95,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
                     for (int itemCourse = 0; itemCourse < nodesCourse.Count; itemCourse++)
                     {
                         data[itemCourse].course = $"{itemCourse + 1} курс";
-                        HtmlDocument htmlDocumentGroup = new HtmlDocument();
+                        HtmlDocument htmlDocumentGroup = new();
                         htmlDocumentGroup.LoadHtml(nodesCourse[itemCourse].InnerHtml);
                         HtmlNodeCollection nodesGroup = htmlDocumentGroup.DocumentNode.SelectNodes("//a");
                         if (nodesGroup != default)
@@ -126,7 +126,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         {
             if (html == default)
                 return default;
-            HtmlDocument htmlDocumentCourse = new HtmlDocument();
+            HtmlDocument htmlDocumentCourse = new();
             htmlDocumentCourse.LoadHtml(html);
             string[] NameCourses = htmlDocumentCourse.DocumentNode.SelectNodes("//table[@class='viewtable']//tr[1]//th")?.Select(x => x.InnerText)?.ToArray();
             HtmlNodeCollection nodesCourse = htmlDocumentCourse.DocumentNode.SelectNodes("//table[@class='viewtable']//tr[2]//td");
@@ -135,7 +135,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
                 (string course, (string nameGroup, string UrlSchedule)[])[] data = new (string course, (string nameGroup, string UrlSchedule)[])[nodesCourse.Count];
                 for (int itemCourse = 0; itemCourse < nodesCourse.Count; itemCourse++)
                 {
-                    HtmlDocument htmlDocumentGroup = new HtmlDocument();
+                    HtmlDocument htmlDocumentGroup = new();
                     htmlDocumentGroup.LoadHtml(nodesCourse[itemCourse].InnerHtml);
                     HtmlNodeCollection nodesGroup = htmlDocumentGroup.DocumentNode.SelectNodes("//a");
                     if (nodesGroup != default)
@@ -162,7 +162,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         public IEnumerable<object> GetData() => courses;
         public void SetData(IEnumerable<object> newData) => courses = newData.Select(x => (Course)x).ToArray();
 
-        public enum TypePars
+        public enum TypePars : uint
         {
             /// <summary>
             /// Парсинг очников (институт)

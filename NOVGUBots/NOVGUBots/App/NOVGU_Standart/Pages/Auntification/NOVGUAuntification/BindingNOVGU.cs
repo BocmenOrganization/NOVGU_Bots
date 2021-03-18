@@ -8,9 +8,9 @@ using System.Linq;
 using System;
 
 
-namespace NOVGUBots.App.NOVGU_Standart.Pages.Authentication
+namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 {
-    public class Main : Page
+    public class BindingNOVGU : Page
     {
         private static readonly ModelMarkerTextData Message_TextStartMain = new(CreatePageAppStandart.NameApp, "MainTextNOVGU", 5);
         private static readonly ModelMarkerTextData Buttons_IdTextStudent = Message_TextStartMain.GetElemNewId(6);

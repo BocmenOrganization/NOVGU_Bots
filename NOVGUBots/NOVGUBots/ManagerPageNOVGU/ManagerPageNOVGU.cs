@@ -1,8 +1,8 @@
 ﻿using BotsCore.Bots.Interface;
 using System.Collections.Generic;
-using NOVGUBots.SettingCore.Interface;
+using NOVGUBots.ManagerPageNOVGU.Interface;
 
-namespace NOVGUBots
+namespace NOVGUBots.ManagerPageNOVGU
 {
     public static class ManagerPageNOVGU
     {

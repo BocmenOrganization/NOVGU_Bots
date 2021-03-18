@@ -7,6 +7,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Model.InstituteCollege;
 using Newtonsoft.Json;
+using System;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData
 {
@@ -14,13 +15,9 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
     {
         public const string Host = "https://www.novsu.ru";
 
-        public static void Start()
-        {
-            var r = ParsInstitute(new WebClient().DownloadString("https://www.novsu.ru/univer/timetable/zaochn/"), TypePars.InstituteInAbsentia, ParalelSetting.Group | ParalelSetting.PeopleGroup | ParalelSetting.Course).First();
-        }
         public static InstituteCollege[] ParsInstitute(string Html, TypePars typePars, ParalelSetting paralelSetting = ParalelSetting.None)
         {
-            HtmlDocument htmlDocument = new HtmlDocument();
+            HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(Html);
             HtmlNodeCollection nodesInstitute;
             InstituteCollege[] institutes = null;
@@ -30,7 +27,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
                 if (nodesInstitute != default)
                 {
                     var dopData = htmlDocument.DocumentNode.SelectNodes("//div[@class='col_element'][2]//div[@class='block2']")?.Select(x => (ClearText(x.SelectSingleNode(x.XPath + "/h2")?.InnerText), x.SelectSingleNode(x.XPath + "/table[@class='viewtable']")?.OuterHtml))?.ToArray();
-                    List<(string name, string html, string dopHtml)> dataPareseInstitute = new List<(string name, string html, string dopHtml)>();
+                    List<(string name, string html, string dopHtml)> dataPareseInstitute = new();
 
                     for (int i = 0; (i + 4) <= nodesInstitute.Count; i += 4)
                     {
@@ -66,7 +63,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
             return institutes;
         }
         public static string ClearText(string text) => string.Join(" ", Regex.Replace(text, @"[\r\n\t]", "").Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)));
-        public enum ParalelSetting
+        [Flags]
+        public enum ParalelSetting : uint
         {
             None = 0,
             Institute = 1,

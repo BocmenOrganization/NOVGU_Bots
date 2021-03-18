@@ -24,11 +24,11 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         }
         private static Day[] ParsInstitute(string url, TypePars typePars)
         {
-            HtmlDocument htmlDocument = new HtmlDocument();
+            HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml((new WebClient()).DownloadString(url));
             HtmlNodeCollection htmlNodesTable = htmlDocument.DocumentNode.SelectNodes("//table[@class='shedultable']//tr");
             DateTime[] StartEndTime = GetInstituteTimesPeriod(htmlDocument);
-            List<(string, (DateTime[] times, string[] numGroup, Text[] subject, Href[] teacher, Href[] auditorium, Href[] comment)[])> Days = new List<(string, (DateTime[] times, string[] numGroup, Text[] subject, Href[] teacher, Href[] auditorium, Href[] comment)[])>();
+            List<(string, (DateTime[] times, string[] numGroup, Text[] subject, Href[] teacher, Href[] auditorium, Href[] comment)[])> Days = new();
             if (htmlNodesTable != null)
             {
                 for (int i = 1; i < htmlNodesTable.Count; i++)
@@ -44,17 +44,17 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             }
             static (DateTime[] times, string[] numGroup, Text[] subject, Href[] teacher, Href[] auditorium, Href[] comment)[] GetDayInfo(string[] lines)
             {
-                List<(DateTime[] times, string[] numGroup, Text[] subject, Href[] teacher, Href[] auditorium, Href[] comment)> resul = new List<(DateTime[] times, string[] numGroup, Text[] subject, Href[] teacher, Href[] auditorium, Href[] comment)>();
+                List<(DateTime[] times, string[] numGroup, Text[] subject, Href[] teacher, Href[] auditorium, Href[] comment)> resul = new();
                 for (int i = 0; i < lines.Length; i++)
                 {
                     int countLine = 0;
                     if (countLine == 0)
                     {
-                        HtmlDocument document = new HtmlDocument();
+                        HtmlDocument document = new();
                         document.LoadHtml(lines[i]);
                         HtmlNodeCollection nodes = document.DocumentNode.SelectNodes("/td");
                         var nodeTime = nodes.FirstOrDefault(x => x.Attributes.Contains("rowspan"));
-                        int.TryParse(nodeTime.Attributes["rowspan"].Value, out countLine);
+                        _ = int.TryParse(nodeTime.Attributes["rowspan"].Value, out countLine);
                         (DateTime[] times, string[] numGroup, Text[] subject, Href[] teacher, Href[] auditorium, Href[] comment) = (null, new string[countLine], new Text[countLine], new Href[countLine], new Href[countLine], new Href[countLine]);
                         byte offset = 0;
                         times = nodeTime.InnerHtml?.Split("<br>")?.Where(x => !string.IsNullOrWhiteSpace(x))?.Select(x => DateTime.Parse(x))?.ToArray();
@@ -65,7 +65,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
                         auditorium[countLine - 1] = GetHref(ref document, nodes[4 - offset]);
                         comment[countLine - 1] = GetHref(ref document, nodes[5 - offset]);
 
-                        static Href GetHref(ref HtmlDocument document, HtmlNode startNode) => new Href() { Text = new Text(Lang.LangTypes.ru, ClearText(startNode.InnerText)), Url = document.DocumentNode.SelectSingleNode(startNode.XPath + "/a[@href]")?.Attributes["href"].Value };
+                        static Href GetHref(ref HtmlDocument document, HtmlNode startNode) => new() { Text = new Text(Lang.LangTypes.ru, ClearText(startNode.InnerText)), Url = document.DocumentNode.SelectSingleNode(startNode.XPath + "/a[@href]")?.Attributes["href"].Value };
 
                         if (countLine > 1)
                         {

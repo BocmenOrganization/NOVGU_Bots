@@ -21,10 +21,10 @@ using BotsCore.Moduls.Tables.ModelTables;
 using BotsCore.Moduls.Tables.Services;
 using BotsCore.User;
 using Newtonsoft.Json;
-using NOVGUBots.App.NOVGU_Standart.Pages;
 using NOVGUBots.Moduls;
 using NOVGUBots.SettingCore;
 using static BotsCore.Bots.Model.ObjectDataMessageSend;
+using NOVGUBots.App.NOVGU_Standart;
 
 namespace NOVGUBots
 {
@@ -38,10 +38,13 @@ namespace NOVGUBots
         {
             new CreatePageAppStandart()
         };
+        /// <summary>
+        /// 
+        /// </summary>
         public static void Main()
         {
-            // Parser.Start();
-            // return;
+            //DataNOVGU.LoadNewData();
+            //return;
             // Получение главного файла настроек
             ObjectSettingCostum settingData = new(SettingPath);
             // Вычлинение некоторых настроек в поля
@@ -62,14 +65,15 @@ namespace NOVGUBots
         public static void LoadApp()
         {
             foreach (var app in apps)
-                ManagerPageNOVGU.AddApp(app);
+                ManagerPageNOVGU.ManagerPageNOVGU.AddApp(app);
         }
         private static void LoadStandartTables()
         {
             ITable[] tables = new ITable[]
             {
                 new ModelTableText("MainTextNOVGU", NOVGUSetting.langs),
-                new ModelTableUniversal<Media[]>("MainMediaNOVGU")
+                new ModelTableUniversal<Media[]>("MainMediaNOVGU"),
+                new ModelTableString("MainStringNOVGU")
             };
             standartTables = new ModelUpdateTablesInternet
                 (

@@ -1,4 +1,4 @@
-﻿namespace NOVGUBots.SettingCore.Interface
+﻿namespace NOVGUBots.ManagerPageNOVGU.Interface
 {
     public interface IGetButtonsSetting
     {

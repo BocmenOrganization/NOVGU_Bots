@@ -1,12 +1,16 @@
 ﻿using BotsCore.Bots.Interface;
+using NOVGUBots.App.NOVGU_Standart.Pages;
 using System;
-using static NOVGUBots.App.NOVGU_Standart.Pages.AppNovgu;
 
-namespace NOVGUBots.App.NOVGU_Standart.Pages
+namespace NOVGUBots.App.NOVGU_Standart
 {
     public class CreatePageAppStandart : ICreatePageApp
     {
         public const string NameApp = "НовГУ_Main";
+        public const string NameTableText = "MainTextNOVGU";
+        public const string NameTableString = "MainStringNOVGU";
+        public const string NameTableMedia = "MainMediaNOVGU";
+
         public const string NamePage_Main = "Главная";
         public const string NamePage_Setting = "Настройки";
         public const string NamePage_StartNewUser = "Start";
@@ -17,11 +21,13 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
         {
             return name switch
             {
-                NamePage_Main => new PageMain(),
-                NamePage_Setting => new PageSetting(),
+                NamePage_Main => null,
+                NamePage_Setting => null,
                 NamePage_StartNewUser => new PageStart(),
-                NamePage_RegisterMain => new Authentication.Main(),
+                NamePage_RegisterMain => new Pages.Auntification.Main(),
                 NamePage_SetLanguage => new PageSetLanguage(),
+                Pages.Auntification.Main.BotsAuntification_Register => new Pages.Auntification.BotsAuntification.Register(),
+                Pages.Auntification.Main.BotsAuntification_Entry => new Pages.Auntification.BotsAuntification.Entry(),
                 _ => null,
             };
         }
@@ -29,11 +35,13 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
         {
             return name switch
             {
-                NamePage_Main => typeof(PageMain),
-                NamePage_Setting => typeof(PageSetting),
+                NamePage_Main => null,
+                NamePage_Setting => null,
                 NamePage_StartNewUser => typeof(PageStart),
-                NamePage_RegisterMain => typeof(Authentication.Main),
+                NamePage_RegisterMain => typeof(Pages.Auntification.Main),
                 NamePage_SetLanguage => typeof(PageSetLanguage),
+                Pages.Auntification.Main.BotsAuntification_Register => typeof(Pages.Auntification.BotsAuntification.Register),
+                Pages.Auntification.Main.BotsAuntification_Entry => typeof(Pages.Auntification.BotsAuntification.Entry),
                 _ => null,
             };
         }
