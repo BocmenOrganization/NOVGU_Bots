@@ -80,7 +80,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
                     UserRegister.AddFlag(UserRegister.RegisterState.LoginPasswordSet, inBot);
                     if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
                     {
-                        ManagerPage.ClearHistoryPage(inBot);
+                        ManagerPage.ClearHistoryListPage(inBot, 1);
                         ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NOVGUAuntification.BindingNOVGU.NamePage);
                     }
                     else

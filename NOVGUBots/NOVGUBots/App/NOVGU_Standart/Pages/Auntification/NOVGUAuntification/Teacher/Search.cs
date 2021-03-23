@@ -57,7 +57,8 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Te
         private static string[] GetWords(string text) => text.ToLower().Split(' ')?.Where(x => !string.IsNullOrWhiteSpace(x))?.ToArray();
         private void CommandInvoke(ObjectDataMessageInBot inBot, string text, object data)
         {
-
+            UserRegister.SetUser(DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.Name == text).User.IdString, inBot);
+            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, IsConfirmationUser.NamePage, new Text[] { new Text(inBot, text) });
         }
 
         public override void ResetLastMessenge(ObjectDataMessageInBot inBot)

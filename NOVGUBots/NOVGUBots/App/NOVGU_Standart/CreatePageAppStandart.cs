@@ -34,8 +34,8 @@ namespace NOVGUBots.App.NOVGU_Standart
                 Pages.Auntification.NOVGUAuntification.Student.Course.NamePage => new Pages.Auntification.NOVGUAuntification.Student.Course(),
                 Pages.Auntification.NOVGUAuntification.Student.Group.NamePage => new Pages.Auntification.NOVGUAuntification.Student.Group(),
                 Pages.Auntification.NOVGUAuntification.Student.User.NamePage => new Pages.Auntification.NOVGUAuntification.Student.User(),
-                Pages.Auntification.NOVGUAuntification.Student.IsConfirmationUser.NamePage => new Pages.Auntification.NOVGUAuntification.Student.IsConfirmationUser(),
-                Pages.Auntification.NOVGUAuntification.Student.ConfirmationUser.NamePage => new Pages.Auntification.NOVGUAuntification.Student.ConfirmationUser(),
+                Pages.Auntification.NOVGUAuntification.IsConfirmationUser.NamePage => new Pages.Auntification.NOVGUAuntification.IsConfirmationUser(),
+                Pages.Auntification.NOVGUAuntification.ConfirmationUser.NamePage => new Pages.Auntification.NOVGUAuntification.ConfirmationUser(),
                 Pages.Auntification.NOVGUAuntification.Teacher.Search.NamePage => new Pages.Auntification.NOVGUAuntification.Teacher.Search(),
                 _ => null,
             };
@@ -57,8 +57,8 @@ namespace NOVGUBots.App.NOVGU_Standart
                 Pages.Auntification.NOVGUAuntification.Student.Course.NamePage => typeof(Pages.Auntification.NOVGUAuntification.Student.Course),
                 Pages.Auntification.NOVGUAuntification.Student.Group.NamePage => typeof(Pages.Auntification.NOVGUAuntification.Student.Group),
                 Pages.Auntification.NOVGUAuntification.Student.User.NamePage => typeof(Pages.Auntification.NOVGUAuntification.Student.User),
-                Pages.Auntification.NOVGUAuntification.Student.IsConfirmationUser.NamePage => typeof(Pages.Auntification.NOVGUAuntification.Student.IsConfirmationUser),
-                Pages.Auntification.NOVGUAuntification.Student.ConfirmationUser.NamePage => typeof(Pages.Auntification.NOVGUAuntification.Student.ConfirmationUser),
+                Pages.Auntification.NOVGUAuntification.IsConfirmationUser.NamePage => typeof(Pages.Auntification.NOVGUAuntification.IsConfirmationUser),
+                Pages.Auntification.NOVGUAuntification.ConfirmationUser.NamePage => typeof(Pages.Auntification.NOVGUAuntification.ConfirmationUser),
                 Pages.Auntification.NOVGUAuntification.Teacher.Search.NamePage => typeof(Pages.Auntification.NOVGUAuntification.Teacher.Search),
                 _ => null,
             };

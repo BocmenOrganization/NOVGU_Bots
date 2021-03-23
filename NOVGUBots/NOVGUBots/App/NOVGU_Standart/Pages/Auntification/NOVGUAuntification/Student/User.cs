@@ -44,7 +44,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
             UserRegister.SetUser(GetUsers(inBot).FirstOrDefault(x => x.Name == text)?.IdString, inBot);
             Array.Resize(ref HistorySet, HistorySet.Length + 1);
             HistorySet[HistorySet.Length - 1] = new Text(inBot, text);
-            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, IsConfirmationUser.NamePage, HistorySet);
+            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, ConfirmationUser.NamePage, HistorySet);
         }
         public override void EventInMessage(ObjectDataMessageInBot inBot)
         {

@@ -22,7 +22,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification
                 // Зарегестрироваться
                 new Button[]
                 {
-                    new Button(Message_TextStart.GetElemNewId(17), (inBot, s, data) => {  ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, BotsAuntification_Register, true); return true; })
+                    new Button(Message_TextStart.GetElemNewId(17), (inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, BotsAuntification_Register, true); return true; })
                 },
                 // Отсоеденить акк
                 new Button[]
@@ -45,7 +45,11 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification
                 // Пропустить
                 new Button[]
                 {
-                    new Button(Message_TextStart.GetElemNewId(20), (inBot, s, data) => {ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NOVGUAuntification.BindingNOVGU.NamePage); return true; })
+                    new Button(Message_TextStart.GetElemNewId(20), (inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NOVGUAuntification.BindingNOVGU.NamePage); return true; })
+                },
+                new Button[]
+                {
+                    new Button(Message_TextStart.GetElemNewId(45), (inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NOVGUAuntification.BindingNOVGU.NamePage); return true; })
                 }
             });
 
@@ -87,12 +91,13 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification
                     registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet) ? (0, 0) : null,
                     // Зарегестрироваться
                     registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet) ? (0, 1) : null,
-                    // Отсоеденить акк
-                    // Это есть у всех
+                    // Отсоеденить акк  Это есть у всех
                     // Удалить акк
                     (!registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet)) ? (0, 3) : null,
                     // Пропустить
-                    registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet) ? (0, 4) : null,
+                    (registerState.HasFlag(UserRegister.RegisterState.NewUser) && !registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet)) ? null : (0, 4),
+                    // Далее
+                    (registerState.HasFlag(UserRegister.RegisterState.NewUser) && registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet)) ? null : (0, 5)
                 }
                 );
         }

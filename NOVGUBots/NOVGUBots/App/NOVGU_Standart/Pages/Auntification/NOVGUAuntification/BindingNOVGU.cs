@@ -22,11 +22,11 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
             {
                 new Button[]
                 {
-                    new Button(Buttons_IdTextStudent, (inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Student.Main.NamePage); return true; })
+                    new Button(Buttons_IdTextStudent, (inBot, s, data) => { UserRegister.SetUserState(UserRegister.UserState.Student, inBot); ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Student.Main.NamePage); return true; })
                 },
                 new Button[]
                 {
-                    new Button(Buttons_IdTextTeacher, (inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Teacher.Search.NamePage); return true; })
+                    new Button(Buttons_IdTextTeacher, (inBot, s, data) => { UserRegister.SetUserState(UserRegister.UserState.Teacher, inBot); ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Teacher.Search.NamePage); return true; })
                 }
             });
 

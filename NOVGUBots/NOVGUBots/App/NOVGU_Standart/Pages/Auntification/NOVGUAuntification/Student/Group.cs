@@ -43,7 +43,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
             UserRegister.SetNameGroup(text, inBot);
             Array.Resize(ref HistorySet, HistorySet.Length + 1);
             HistorySet[HistorySet.Length - 1] = new Text(inBot, text);
-            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, User.NamePage, HistorySet);
+            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, IsConfirmationUser.NamePage, HistorySet);
         }
 
         public override void EventInMessage(ObjectDataMessageInBot inBot)

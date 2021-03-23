@@ -15,7 +15,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
         {
             (SmtpClient smtpClient, MailAddress from) = GetClient();
             MailMessage mailMessage = new MailMessage(from, new MailAddress(email, userName));
-            mailMessage.Subject = "Мудрец - подтверждение авторизации";
+            mailMessage.Subject = "...";
             mailMessage.Body = codeSend;
             mailMessage.IsBodyHtml = true;
             smtpClient.Send(mailMessage);
