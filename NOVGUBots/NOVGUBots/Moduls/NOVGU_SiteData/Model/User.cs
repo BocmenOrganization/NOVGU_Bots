@@ -1,35 +1,51 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
+using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 {
-    public class User
+    public class User : IGetId
     {
-        public string Name;
-        public uint Id;
-        public string IdString;
-        public string Email;
-        public string UrlPage => $"http://people.novsu.ru/profiles/html/profileView.do?userid={IdString}&lang=ru_ru";
-        public string PageFiles => $"https://www.novsu.ru/doc/study/{IdString}";
         private static CookieContainer cookiesPars;
-        private static readonly Regex rg = new Regex("userid=([^&$\r\n]*)", RegexOptions.Compiled);
+        private static readonly Regex rg = new("userid=([^&$\r\n]*)", RegexOptions.Compiled);
+
+        [JsonProperty]
+        public string Name { get; private set; }
+        [JsonProperty]
+        public uint Id { get; private set; }
+        [JsonProperty]
+        public string IdString { get; private set; }
+        [JsonProperty]
+        public string Email { get; private set; }
+        [JsonIgnore]
+        public string UrlPage => IdString != null ? $"http://people.novsu.ru/profiles/html/profileView.do?userid={IdString}&lang=ru_ru" : null;
+        [JsonIgnore]
+        public string PageFiles => IdString != null ? $"https://www.novsu.ru/doc/study/{IdString}" : null;
 
         public User(string Name, string url)
         {
             this.Name = Name;
             Id = uint.Parse(Path.GetFileName(url));
             IdString = GetId(GetUrlUserPage(Id));
-            Email = GetEmail(UrlPage);
+            Email = IdString != null ? GetEmail(UrlPage) : null;
         }
+        [JsonConstructor]
+        private User() { }
+
         private static string GetId(string url)
         {
-            MatchCollection matchedAuthors = rg.Matches(url);
-            if (matchedAuthors != null && matchedAuthors.Count > 0)
-                return matchedAuthors.Last().Groups[1].Value;
+            if (url != null)
+            {
+                MatchCollection matchedAuthors = rg.Matches(url);
+                if (matchedAuthors != null && matchedAuthors.Count > 0)
+                    return matchedAuthors.Last().Groups[1].Value;
+            }
             return null;
         }
         private static string GetEmail(string url)
@@ -49,8 +65,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             }
             var r = GetResponse(url);
             using Stream stream = r.GetResponseStream();
-            using StreamReader streamReader = new StreamReader(stream);
-            HtmlDocument htmlDocument = new HtmlDocument();
+            using StreamReader streamReader = new(stream);
+            HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(streamReader.ReadToEnd());
             if (htmlDocument.DocumentNode.SelectSingleNode("//span[@id='npe_instance_3453_npe_content']") != default)
                 return htmlDocument;
@@ -84,6 +100,14 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             }
             return null;
         }
+
         public override string ToString() => Name;
+
+        public bool Similarity(object e)
+        {
+            if (e is User user)
+                return user.Id == Id && user.Email == Email && user.Name == Name;
+            return false;
+        }
     }
 }

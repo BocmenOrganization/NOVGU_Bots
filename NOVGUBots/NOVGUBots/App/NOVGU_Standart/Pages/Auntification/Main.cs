@@ -9,9 +9,9 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification
 {
     public class Main : Page
     {
-        public const string BotsAuntification_Register = "Регистрация->РегистрацияБота";
-        public const string BotsAuntification_Entry = "Регистрация->ВходАккБота";
-        private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 12);
+        public const string BotsAuntification_Register = "UserBot=Регистрация->РегистрацияБота";
+        public const string BotsAuntification_Entry = "UserBot=Регистрация->ВходАккБота";
+        private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 15);
         private static readonly KitButton ButtonsMessage_Main = new(new Button[][]
             {
                 // Войти
@@ -45,7 +45,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification
                 // Пропустить
                 new Button[]
                 {
-                    new Button(Message_TextStart.GetElemNewId(20), (inBot, s, data) => { return true; })
+                    new Button(Message_TextStart.GetElemNewId(20), (inBot, s, data) => {ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NOVGUAuntification.BindingNOVGU.NamePage); return true; })
                 }
             });
 

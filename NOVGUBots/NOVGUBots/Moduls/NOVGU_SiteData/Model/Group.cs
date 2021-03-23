@@ -1,20 +1,30 @@
 ﻿using System.Linq;
-using static NOVGUBots.Moduls.NOVGU_SiteData.Model.InstituteCollege;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 using HtmlAgilityPack;
 using System.Net;
 using BotsCore.Moduls.Translate;
+using NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule;
+using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 {
-    public class Group
+    public class Group : IUpdated
     {
-        public string Name;
-        public uint YearReceipt;
-        public Text Direction;
-        public Text Profile;
-        public User[] users;
-        public TableSchedule tableSchedule;
+        [JsonProperty]
+        public string Name { get; private set; }
+        [JsonProperty]
+        public uint YearReceipt { get; private set; }
+        [JsonProperty]
+        public Text Direction { get; private set; }
+        [JsonProperty]
+        public Text Profile { get; private set; }
+        [JsonProperty]
+        public User[] users { get; private set; }
+        [JsonProperty]
+        public TableScheduleStudents tableSchedule;
+
         public Group(TypePars typePars, ParalelSetting paralelSetting, string name, string urlSchedule)
         {
             Name = name;
@@ -26,8 +36,10 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
                 users = dataParsUser.users?.AsParallel()?.Select(x => new User(x.Name, x.Url))?.ToArray();
             else
                 users = dataParsUser.users?.Select(x => new User(x.Name, x.Url))?.ToArray();
-            tableSchedule = new TableSchedule(urlSchedule, typePars);
+            tableSchedule = new TableScheduleStudents(urlSchedule, typePars);
         }
+        [JsonConstructor]
+        private Group() { }
         private static ((string Name, string Url)[] users, Text Direction, uint YearReceipt, Text Profile) GetUsers(string NameGroup, TypePars typePars)
         {
             ((string Name, string Url)[] users, Text Direction, uint YearReceipt, Text Profile) resul = default;
@@ -86,7 +98,33 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             }
             return resul;
         }
-
         public override string ToString() => $"{Name} {Direction}";
+
+        public IEnumerable<object> GetData() => throw new System.NotImplementedException();
+        public void SetData(IEnumerable<object> newData) => throw new System.NotImplementedException();
+        public IEnumerable<Text> GetTextsTranslate()
+        {
+            List<Text> texts = new List<Text> { Direction, Profile };
+            if (tableSchedule != null)
+                texts.AddRange(tableSchedule.GetTextsTranslate());
+            return texts;
+        }
+        public bool Similarity(object e)
+        {
+            if (e is Group group)
+                return group.Name == Name && group.YearReceipt == YearReceipt;
+            return false;
+        }
+        public bool Update(IEnumerable<object> newData, ref List<object> updatedInfo)
+        {
+            TableScheduleStudents tableSchedule = (TableScheduleStudents)newData?.FirstOrDefault(x => x is TableScheduleStudents);
+            object[] users = newData.Where(x => x is User).ToArray();
+
+            var updatedUserInfo = IUpdated.Update(users, users, ref updatedInfo);
+            if (updatedUserInfo.stateUpdated)
+                users = updatedUserInfo.newData?.Select(x => (User)x).ToArray();
+            (bool ifoUpdateTableSchedule, _) = IUpdated.Update(tableSchedule.GetData(), tableSchedule.GetData(), ref updatedInfo);
+            return updatedUserInfo.stateUpdated || ifoUpdateTableSchedule;
+        }
     }
 }

@@ -1,120 +1,138 @@
 ﻿using BotsCore.Moduls;
 using BotsCore.Moduls.Translate;
+using Newtonsoft.Json;
 using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
 using NOVGUBots.Moduls.NOVGU_SiteData.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
-using static NOVGUBots.Moduls.NOVGU_SiteData.Model.InstituteCollege;
+using static NOVGUBots.Moduls.NOVGU_SiteData.Model.SchedulePage;
+using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData
 {
     public static class DataNOVGU
     {
+        private const string UrlTeachers = "https://www.novsu.ru/univer/timetable/ochn/i.1103357/?page=allTeachersTimetable";
+        public const string PatcSaveInfo = "NOVGUParserData";
+        public const string NameFileSchedules = "FileSchedules.json";
+
 #pragma warning disable CA2211 // Поля, не являющиеся константами, не должны быть видимыми
-        public static Parser.ParalelSetting DefaultParalelSetting = Parser.ParalelSetting.PeopleTeacher | Parser.ParalelSetting.PeopleGroup | Parser.ParalelSetting.Course | Parser.ParalelSetting.Institute;
-        public delegate void Update(TypePars typePars, List<object> updateInfo);
-
-        public static Text NameInstituteFullTime = new(Lang.LangTypes.ru, "Очная форма обучения");
-        public const string UrlInstituteFullTime = "https://www.novsu.ru/univer/timetable/ochn/";
-        public static Update EventUpdateInstituteFullTime;
-        public static InstituteCollege[] InstituteFullTime = Array.Empty<InstituteCollege>();
-
-        public static Text NameInstituteInAbsentia = new(Lang.LangTypes.ru, "Заочная форма обучения");
-        public const string UrlInstituteInAbsentia = "https://www.novsu.ru/univer/timetable/zaochn/";
-        public static Update EventUpdateInstituteInAbsentia;
-        public static InstituteCollege[] InstituteInAbsentia = Array.Empty<InstituteCollege>();
-
-        public static Text NameCollege = new(Lang.LangTypes.ru, "Колледжи");
-        public const string UrlCollege = "https://www.novsu.ru/univer/timetable/spo/";
-        public static Update EventUpdateCollege;
-        public static InstituteCollege[] College = Array.Empty<InstituteCollege>();
-
-        public static Text NameSession = new(Lang.LangTypes.ru, "Сессия");
-        public const string UrlSession = "https://www.novsu.ru/univer/timetable/session/";
-        public static Update EventUpdateSession;
-        public static InstituteCollege[] Session = Array.Empty<InstituteCollege>();
+        public static ParalelSetting DefaultParalelSetting = ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute;
 #pragma warning restore CA2211 // Поля, не являющиеся константами, не должны быть видимыми
 
-        public static void LoadNewData(Parser.ParalelSetting? paralelSetting = null)
+        private static readonly SchedulePage[] schedules = new SchedulePage[]
         {
-            paralelSetting ??= DefaultParalelSetting;
-            LoadInstituteData(TypePars.InstituteFullTime, (Parser.ParalelSetting)paralelSetting);
+            new SchedulePage(new(Lang.LangTypes.ru, "Очная форма обучения"), "https://www.novsu.ru/univer/timetable/ochn/", TypePars.InstituteFullTime),
+            new SchedulePage(new(Lang.LangTypes.ru, "Заочная форма обучения"), "https://www.novsu.ru/univer/timetable/zaochn/", TypePars.InstituteInAbsentia),
+            new SchedulePage(new(Lang.LangTypes.ru, "Колледжи"), "https://www.novsu.ru/univer/timetable/spo/", TypePars.College),
+            new SchedulePage(new(Lang.LangTypes.ru, "Сессия"), "https://www.novsu.ru/univer/timetable/session/", TypePars.Session)
+        };
+        public static UserTeacher[] UserTeachers { get; private set; }
+        public static Update EventUpdateUserTeachers { get; set; }
+
+        /// <summary>
+        /// Очников (институт)
+        /// </summary>
+        public static SchedulePage InstituteFullTime
+        {
+            get
+            {
+                return schedules[0];
+            }
+        }
+        /// <summary>
+        /// Заочников (институт)
+        /// </summary>
+        public static SchedulePage InstituteInAbsentia
+        {
+            get
+            {
+                return schedules[1];
+            }
+        }
+        /// <summary>
+        /// Колледж
+        /// </summary>
+        public static SchedulePage College
+        {
+            get
+            {
+                return schedules[2];
+            }
+        }
+        /// <summary>
+        /// Сессия
+        /// </summary>
+        public static SchedulePage Session
+        {
+            get
+            {
+                return schedules[3];
+            }
         }
 
-        private static void LoadInstituteData(TypePars type, Parser.ParalelSetting paralelSetting)
+        static DataNOVGU()
         {
-            List<object> listUpdate = null;
-            InstituteCollege[] newData = Parser.ParsInstitute((new WebClient()).DownloadString(GetUrlInstitute(type)), type, paralelSetting);
-            IEnumerable<object> df = GetInstitute(type);
-            if (!df.Any())
-            {
-                bool isUpdate = false;
-                (isUpdate, df) = IUpdated.Update(newData, df, ref listUpdate);
-                if (isUpdate)
-                    SetDataInstitute(type, df.Select(x => (InstituteCollege)x).ToArray(), listUpdate);
-            }
+            var Texts = schedules.Select(x => x.Name);
+            if (SettingCore.NOVGUSetting.langs != null)
+                foreach (var lang in SettingCore.NOVGUSetting.langs)
+                    Text.MultiTranslate(lang, Texts);
+
+            string PatchFile = Path.Combine(PatcSaveInfo, NameFileSchedules);
+            if (File.Exists(PatchFile))
+                (schedules, UserTeachers) = JsonConvert.DeserializeObject<(SchedulePage[], UserTeacher[])>(File.ReadAllText(PatchFile));
             else
-                SetDataInstitute(type, newData);
+                LoadNewData(ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute);
         }
-        private static IEnumerable<InstituteCollege> GetInstitute(TypePars type)
+        public static void Start() { }
+        public static void LoadNewData(ParalelSetting? paralelSetting = null)
         {
-#pragma warning disable CS8524 // Выражение switch не обрабатывает некоторые типы входных значений, в том числе неименованное значение перечисления (не является исчерпывающим).
+            paralelSetting ??= DefaultParalelSetting;
+
+            if (paralelSetting.Value.HasFlag(ParalelSetting.Schedule))
+                schedules.AsParallel().ForAll(x => x.UpdateData(GetNewData(x)));
+            else
+                foreach (var item in schedules)
+                    item.UpdateData(GetNewData(item));
+
+            List<object> infoUpdate = new List<object>();
+            var NewDataUserTeachers = GetTeachers(new WebClient().DownloadString(UrlTeachers), (ParalelSetting)paralelSetting);
+            var UpdateInfoUserTeachers = IUpdated.Update(NewDataUserTeachers, UserTeachers, ref infoUpdate);
+            if (UpdateInfoUserTeachers.stateUpdated)
+            {
+                UserTeachers = UpdateInfoUserTeachers.newData.Select(x => (UserTeacher)x).ToArray();
+                if (EventUpdateUserTeachers != null)
+                {
+                    try
+                    {
+                        EventUpdateUserTeachers.Invoke(infoUpdate);
+                    }
+                    catch (Exception e)
+                    {
+                        EchoLog.Print($"Произошла ошибка при обработки события обновления данных учителей: {e.Message}");
+                    }
+                }
+            }
+
+            if (!Directory.Exists(PatcSaveInfo))
+                Directory.CreateDirectory(PatcSaveInfo);
+
+            File.WriteAllText(Path.Combine(PatcSaveInfo, NameFileSchedules), JsonConvert.SerializeObject((schedules, UserTeachers), Formatting.Indented));
+
+            InstituteCollege[] GetNewData(SchedulePage schedule) => ParsInstitute(new WebClient().DownloadString(schedule.Url), schedule.TypeInstitute, (Parser.ParalelSetting)paralelSetting);
+        }
+        public static SchedulePage GetInfoScheduleInstitute(TypePars type)
+        {
             return type switch
-#pragma warning restore CS8524 // Выражение switch не обрабатывает некоторые типы входных значений, в том числе неименованное значение перечисления (не является исчерпывающим).
             {
                 TypePars.InstituteFullTime => InstituteFullTime,
                 TypePars.InstituteInAbsentia => InstituteInAbsentia,
                 TypePars.College => College,
-                TypePars.Session => Session
-            };
-        }
-        private static void SetDataInstitute(TypePars type, InstituteCollege[] newData, List<object> updateInfo = null)
-        {
-            switch (type)
-            {
-                case TypePars.InstituteFullTime:
-                    Update(ref InstituteFullTime, EventUpdateInstituteFullTime, NameInstituteFullTime);
-                    break;
-                case TypePars.InstituteInAbsentia:
-                    Update(ref InstituteInAbsentia, EventUpdateInstituteInAbsentia, NameInstituteInAbsentia);
-                    break;
-                case TypePars.College:
-                    Update(ref College, EventUpdateCollege, NameCollege);
-                    break;
-                case TypePars.Session:
-                    Update(ref Session, EventUpdateSession, NameSession);
-                    break;
-            }
-            void Update(ref InstituteCollege[] instituteColleges, Update update, Text nameInstituteColleg)
-            {
-#pragma warning disable CS0728 // Возможно, используется недопустимое назначение для локального параметра, который является аргументом оператора using или lock
-                lock (instituteColleges) { instituteColleges = newData; }
-#pragma warning restore CS0728 // Возможно, используется недопустимое назначение для локального параметра, который является аргументом оператора using или lock
-                if (EventUpdateInstituteFullTime != null)
-                {
-                    try
-                    {
-                        EventUpdateInstituteFullTime.Invoke(type, updateInfo);
-                    }
-                    catch (Exception e)
-                    {
-                        EchoLog.Print($"Произошла ошибка при обработки события обновления {nameInstituteColleg}: {e.Message}");
-                    }
-                }
-            }
-        }
-        private static string GetUrlInstitute(TypePars type)
-        {
-#pragma warning disable CS8524 // Выражение switch не обрабатывает некоторые типы входных значений, в том числе неименованное значение перечисления (не является исчерпывающим).
-            return type switch
-#pragma warning restore CS8524 // Выражение switch не обрабатывает некоторые типы входных значений, в том числе неименованное значение перечисления (не является исчерпывающим).
-            {
-                TypePars.InstituteFullTime => UrlInstituteFullTime,
-                TypePars.InstituteInAbsentia => UrlInstituteInAbsentia,
-                TypePars.College => UrlCollege,
-                TypePars.Session => UrlSession
+                TypePars.Session => Session,
+                _ => null
             };
         }
     }

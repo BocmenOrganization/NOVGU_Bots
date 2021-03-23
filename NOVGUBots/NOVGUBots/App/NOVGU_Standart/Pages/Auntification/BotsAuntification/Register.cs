@@ -42,7 +42,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage) => ResetLastMessenge(inBot);
         public override void EventClose(ObjectDataMessageInBot inBot)
         {
-            if (inBot.User.Password == null) 
+            if (inBot.User.Password == null)
                 inBot.User.Login = null;
         }
         public override void EventInMessage(ObjectDataMessageInBot inBot)
@@ -78,7 +78,13 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
                 {
                     inBot.User.Password = inBot.MessageText;
                     UserRegister.AddFlag(UserRegister.RegisterState.LoginPasswordSet, inBot);
-                    ManagerPage.SetBackPage(inBot);
+                    if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
+                    {
+                        ManagerPage.ClearHistoryPage(inBot);
+                        ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NOVGUAuntification.BindingNOVGU.NamePage);
+                    }
+                    else
+                        ManagerPage.SetBackPage(inBot);
                 }
                 else
                 {

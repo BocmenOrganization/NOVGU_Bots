@@ -39,7 +39,9 @@ namespace NOVGUBots.SettingCore
         public (string NameApp, string NamePage, object SendDataPage) GetPageNonHistoryPage(ObjectDataMessageInBot inBot)
         {
             if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
+            {
                 return (CreatePageAppStandart.NameApp, CreatePageAppStandart.NamePage_RegisterMain, null);
+            }
             //TODO указать главную страницу (в разработке)
             return default;
         }

@@ -68,4 +68,8 @@ ManagerUser_PathFileSetting=>Settings\SettingUser.txt;
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Bots Telegram ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 
-BotsTelegram_ListBots=>[{"Item1":"Telegram","Item2":"1657650627:AAGamT-BhL3vD8mFLN7vZ8rpRwAl6QuMw2k"}];
+BotsTelegram_ListBots=>[{"Item1":"Telegram","Item2":"1657650627:AAEjwPyQzsJ3WCmtd6bYD-jqIKvwT3iHfRg"}];
+
+# ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Maling ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+AuthorizationMailing=>{"Item1":"smtp.gmail.com", "Item2":587, "Item3":[{"Item1":"arduinoproect@gmail.com", "Item2":"gfgfvfvf556169305ltybc"}]};

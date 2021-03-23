@@ -4,15 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
+using Newtonsoft.Json;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 {
     public class InstituteCollege : IUpdated
     {
-        public string Id;
-        public Text Name;
-        public Course[] courses;
-        public TypePars typePars;
+        [JsonProperty]
+        public string Id { get; private set; }
+        [JsonProperty]
+        public Text Name { get; private set; }
+        [JsonProperty]
+        public Course[] Courses { get; private set; }
+        [JsonProperty]
+        public TypePars typePars { get; private set; }
+
         public InstituteCollege(string name, string html, string dopHtml, TypePars typePars, ParalelSetting paralelSetting)
         {
             if (typePars != TypePars.College)
@@ -21,14 +27,19 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             var data = LoadData(html, dopHtml, typePars, paralelSetting);
             if (data != null)
             {
-                if (name == null && data.Value.id != null)
-                    Name = new Text(Lang.LangTypes.ru, data.Value.id);
+                name = data.Value.id;
+                if (name?.Contains("колледж") ?? false)
+                    name = ClearText(name.Replace("колледж", string.Empty));
+                if (Name == null && name != null)
+                    Name = new Text(Lang.LangTypes.ru, name);
                 Id = data.Value.id;
-                courses = data.Value.courses?.Where(x => x?.groups != null).ToArray();
-                if (courses != null && courses.Length == 0)
-                    courses = null;
+                Courses = data.Value.courses?.Where(x => x?.groups != null).ToArray();
+                if (Courses != null && Courses.Length == 0)
+                    Courses = null;
             }
         }
+        [JsonConstructor]
+        private InstituteCollege() { }
         private static (string id, Course[] courses)? LoadData(string html, string dopHtml, TypePars typePars, ParalelSetting paralelSetting)
         {
             (string idInstitute, (string course, (string nameGroup, string UrlSchedule)[])[])? data;
@@ -157,29 +168,21 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 
         public override string ToString() => (typePars == TypePars.College ? $"id-Название: {Id}" : $"Id: {Id}, Название: {Name}") + $" Тип: {typePars}";
 
-        public string GetId() => Id;
-        public IEnumerable<Text> GetTextsTranslate() => new List<Text>() { Name };
-        public IEnumerable<object> GetData() => courses;
-        public void SetData(IEnumerable<object> newData) => courses = newData.Select(x => (Course)x).ToArray();
-
-        public enum TypePars : uint
+        public IEnumerable<Text> GetTextsTranslate()
         {
-            /// <summary>
-            /// Парсинг очников (институт)
-            /// </summary>
-            InstituteFullTime,
-            /// <summary>
-            /// Парсинг заочников (институт)
-            /// </summary>
-            InstituteInAbsentia,
-            /// <summary>
-            /// Парсинг колледжей
-            /// </summary>
-            College,
-            /// <summary>
-            /// Парсинг сессии
-            /// </summary>
-            Session
+            List<Text> texts = new List<Text>() { Name };
+            if (Courses != null)
+                foreach (var item in Courses)
+                    texts.AddRange(item.GetTextsTranslate());
+            return texts;
+        }
+        public IEnumerable<object> GetData() => Courses;
+        public void SetData(IEnumerable<object> newData) => Courses = newData?.Select(x => (Course)x).ToArray();
+        public bool Similarity(object e)
+        {
+            if (e is InstituteCollege instituteCollege)
+                return instituteCollege.Id == Id;
+            return false;
         }
     }
 }

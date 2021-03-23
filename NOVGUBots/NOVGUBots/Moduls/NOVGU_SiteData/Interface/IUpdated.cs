@@ -32,27 +32,30 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Interface
         {
             bool resul = false;
             List<object> NewList = new();
-            List<object> ThisList = oldData.ToList();
+            List<object> ThisList = oldData?.ToList();
             if (updatedElem == default)
                 updatedElem = new List<object>();
-            foreach (var elem in newData)
+            if (newData != null)
             {
-                object Identy = ThisList.FirstOrDefault(x => ((IGetId)x).GetId() == ((IGetId)elem).GetId());
-                if (Identy != null)
+                foreach (var elem in newData)
                 {
-                    if(elem is IUpdated updated)
-                        resul |= ((IUpdated)Identy).Update(updated.GetData(), ref updatedElem);
-                    NewList.Add(Identy);
-                    ThisList.Remove(Identy);
-                }
-                else
-                {
-                    NewList.Add(elem);
-                    updatedElem.Add(elem);
-                    resul = true;
+                    object Identy = ThisList?.FirstOrDefault(x => ((IGetId)x).Similarity(elem));
+                    if (Identy != null)
+                    {
+                        if (elem is IUpdated updated)
+                            resul |= ((IUpdated)Identy).Update(updated.GetData(), ref updatedElem);
+                        NewList.Add(Identy);
+                        ThisList?.Remove(Identy);
+                    }
+                    else
+                    {
+                        NewList.Add(elem);
+                        updatedElem.Add(elem);
+                        resul = true;
+                    }
                 }
             }
-            if (ThisList.Count > 0)
+            if (ThisList != null && ThisList.Count > 0)
                 resul = true;
             if (resul)
                 return (resul, NewList);
