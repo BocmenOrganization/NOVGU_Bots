@@ -115,7 +115,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
             }
             SendDataBot(objectDataMessageSend);
         }
-        private static bool CheckCorrectLoginAndPassword(string s) => s?.FirstOrDefault(x => !(char.IsDigit(x) || char.IsLetter(x))) == '\0';
+        private static bool CheckCorrectLoginAndPassword(string s) => !string.IsNullOrEmpty(s) && s?.FirstOrDefault(x => !(char.IsDigit(x) || char.IsLetter(x))) == '\0';
         private static bool CheckLoginBusy(string s) => ManagerUser.SearchUser((x) => x.Login == s) == null;
     }
 }

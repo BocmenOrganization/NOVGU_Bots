@@ -56,12 +56,17 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
                 if (typePars != TypePars.Teacher)
                     numGroup[countLine - 1] = ClearText(nodes[1 - offset - offsetType].InnerText);
                 subject[countLine - 1] = new Text(Lang.LangTypes.ru, ClearText(nodes[2 - offset - offsetType].InnerText));
-                who[countLine - 1] = GetHref(ref document, nodes[3 - offset - offsetType]);
-                auditorium[countLine - 1] = GetHref(ref document, nodes[4 - offset - offsetType]);
+                who[countLine - 1] = GetHref(ref document, nodes[3 - offset - offsetType], typePars == TypePars.Teacher);
+                auditorium[countLine - 1] = GetHref(ref document, nodes[4 - offset - offsetType], true);
                 comment[countLine - 1] = GetHref(ref document, nodes[5 - offset - offsetType]);
 
-                static Href GetHref(ref HtmlDocument document, HtmlNode startNode) => new() { Text = new Text(Lang.LangTypes.ru, ClearText(startNode.InnerText)), Url = document.DocumentNode.SelectSingleNode(startNode.XPath + "/a[@href]")?.Attributes["href"].Value };
-
+                static Href GetHref(ref HtmlDocument document, HtmlNode startNode, bool LockText = false)
+                {
+                    string text = ClearText(startNode.InnerText);
+                    if (!string.IsNullOrWhiteSpace(text))
+                        return new() { Text = new Text(Lang.LangTypes.ru, text) { LockTranslator = LockText }, Url = document.DocumentNode.SelectSingleNode(startNode.XPath + "/a[@href]")?.Attributes["href"].Value };
+                    return null;
+                }
                 if (countLine > 1)
                 {
                     countLine--;
@@ -139,7 +144,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
             )).ToArray();
         }
 
-        public struct Href
+        public class Href
         {
             public Text Text;
             public string Url;
@@ -168,17 +173,17 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
             [JsonConstructor]
             private DayStudents() { }
             public IEnumerable<object> GetData() => Lines;
-            public IEnumerable<Text> GetTextsTranslate()
+            public List<Text> GetTextsTranslate()
             {
                 List<Text> texts = new();
                 if (Lines != null)
                 {
                     foreach (var elem in Lines)
                     {
-                        texts.AddRange(elem.Auditorium?.Select(x => x.Text));
-                        texts.AddRange(elem.Comment?.Select(x => x.Text));
+                        texts.AddRange(elem.Auditorium?.Select(x => x?.Text).Where(x => x != null));
+                        texts.AddRange(elem.Comment?.Select(x => x?.Text).Where(x => x != null));
                         texts.AddRange(elem.Subject);
-                        texts.AddRange(elem.Who?.Select(x => x.Text));
+                        texts.AddRange(elem.Who?.Select(x => x?.Text).Where(x => x != null));
                     }
                 }
                 return texts;
@@ -207,17 +212,17 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
             private DayTeacher() { }
             public IEnumerable<object> GetData() => Lines;
             public void SetData(IEnumerable<object> newData) => Lines = newData?.Select(x => (LineTeacher)x).ToArray();
-            public IEnumerable<Text> GetTextsTranslate()
+            public List<Text> GetTextsTranslate()
             {
                 List<Text> texts = new();
                 if (Lines != null)
                 {
                     foreach (var elem in Lines)
                     {
-                        texts.AddRange(elem.Auditorium?.Select(x => x.Text));
-                        texts.AddRange(elem.Comment?.Select(x => x.Text));
+                        texts.AddRange(elem.Auditorium?.Select(x => x?.Text).Where(x => x != null));
+                        texts.AddRange(elem.Comment?.Select(x => x?.Text).Where(x => x != null));
                         texts.AddRange(elem.Subject);
-                        texts.AddRange(elem.Who?.Select(x => x.Text));
+                        texts.AddRange(elem.Who?.Select(x => x?.Text).Where(x => x != null));
                     }
                 }
                 return texts;

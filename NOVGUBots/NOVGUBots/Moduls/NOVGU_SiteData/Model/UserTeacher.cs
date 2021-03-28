@@ -31,7 +31,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         }
         public IEnumerable<object> GetData() => Schedule;
         public void SetData(IEnumerable<object> newData) => Schedule = newData.Select(x => (DayTeacher)x).ToArray();
-        public IEnumerable<Text> GetTextsTranslate()
+        public List<Text> GetTextsTranslate()
         {
             List<Text> texts = new List<Text>();
             if (Schedule!= null)

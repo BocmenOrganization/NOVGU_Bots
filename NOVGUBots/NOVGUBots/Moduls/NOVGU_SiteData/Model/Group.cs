@@ -102,9 +102,9 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 
         public IEnumerable<object> GetData() => throw new System.NotImplementedException();
         public void SetData(IEnumerable<object> newData) => throw new System.NotImplementedException();
-        public IEnumerable<Text> GetTextsTranslate()
+        public List<Text> GetTextsTranslate()
         {
-            List<Text> texts = new List<Text> { Direction, Profile };
+            List<Text> texts = new() { Direction, Profile };
             if (tableSchedule != null)
                 texts.AddRange(tableSchedule.GetTextsTranslate());
             return texts;

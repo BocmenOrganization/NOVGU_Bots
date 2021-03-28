@@ -57,7 +57,7 @@ namespace NOVGUBots.App.NOVGU_Standart
         public enum RegisterState : uint
         {
             NewUser = 1,
-            GroupSet = 2,
+            GroupOrTeacherSet = 2,
             LoginPasswordSet = 4,
             ConnectNovgu = 8
         }

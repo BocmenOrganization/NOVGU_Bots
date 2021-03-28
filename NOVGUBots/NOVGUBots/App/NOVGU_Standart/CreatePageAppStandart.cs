@@ -1,10 +1,14 @@
 ﻿using BotsCore.Bots.Interface;
+using BotsCore.Bots.Model;
+using BotsCore.Moduls.Tables.Services;
+using BotsCore.Moduls.Translate;
 using NOVGUBots.App.NOVGU_Standart.Pages;
+using NOVGUBots.ManagerPageNOVGU.Interface;
 using System;
 
 namespace NOVGUBots.App.NOVGU_Standart
 {
-    public class CreatePageAppStandart : ICreatePageApp
+    public class CreatePageAppStandart : ICreatePageApp, IGetButtonsSetting
     {
         public const string NameApp = "НовГУ_Main";
         public const string NameTableText = "MainTextNOVGU";
@@ -15,14 +19,15 @@ namespace NOVGUBots.App.NOVGU_Standart
         public const string NamePage_Setting = "Настройки";
         public const string NamePage_StartNewUser = "Start";
         public const string NamePage_RegisterMain = "Регистрация->UserBot->Главная";
+        private static readonly ModelMarkerTextData ButtonName_SetLanguage = new(NameApp, NameTableText, 46);
         public const string NamePage_SetLanguage = "Выбор языка";
         public string GetNameApp() => NameApp;
-        public object GetPage(string name, IBot.BotTypes? botType = null, string keyBot = null)
+        public object GetPage(string name, ObjectDataMessageInBot inBot)
         {
             return name switch
             {
-                NamePage_Main => null,
-                NamePage_Setting => null,
+                NamePage_Main => new ManagerPageNOVGU.ManagerPageNOVGU.PageMain(),
+                NamePage_Setting => new ManagerPageNOVGU.ManagerPageNOVGU.PageSetting(),
                 NamePage_StartNewUser => new PageStart(),
                 NamePage_RegisterMain => new Pages.Auntification.Main(),
                 NamePage_SetLanguage => new PageSetLanguage(),
@@ -40,12 +45,23 @@ namespace NOVGUBots.App.NOVGU_Standart
                 _ => null,
             };
         }
-        public Type GetTypePage(string name, IBot.BotTypes? botType = null, string keyBot = null)
+
+        public (string AppName, string PageName, Text NameButton)[] GetPages(ObjectDataMessageInBot inBot)
+        {
+            return new (string AppName, string PageName, Text NameButton)[]
+            {
+                (NameApp, NamePage_SetLanguage, ButtonName_SetLanguage),
+                (NameApp, NamePage_RegisterMain, ButtonName_SetLanguage.GetElemNewId(47)),
+                (NameApp, Pages.Auntification.NOVGUAuntification.BindingNOVGU.NamePage, ButtonName_SetLanguage.GetElemNewId(48))
+            };
+        }
+
+        public Type GetTypePage(string name, ObjectDataMessageInBot inBot)
         {
             return name switch
             {
-                NamePage_Main => null,
-                NamePage_Setting => null,
+                NamePage_Main => typeof(ManagerPageNOVGU.ManagerPageNOVGU.PageMain),
+                NamePage_Setting => typeof(ManagerPageNOVGU.ManagerPageNOVGU.PageSetting),
                 NamePage_StartNewUser => typeof(PageStart),
                 NamePage_RegisterMain => typeof(Pages.Auntification.Main),
                 NamePage_SetLanguage => typeof(PageSetLanguage),

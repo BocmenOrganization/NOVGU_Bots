@@ -27,7 +27,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         public override string ToString() => $"Название: {Name}, Кол-во групп: {groups.Length}";
 
         public IEnumerable<object> GetData() => groups;
-        public IEnumerable<Text> GetTextsTranslate()
+        public List<Text> GetTextsTranslate()
         {
             List<Text> texts = new List<Text> { Name };
             if (groups != null)

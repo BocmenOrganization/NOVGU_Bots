@@ -1,8 +1,11 @@
 ﻿using BotsCore.Moduls;
 using BotsCore.Moduls.Translate;
+using BotsCore.User.Models;
 using Newtonsoft.Json;
+using NOVGUBots.App.NOVGU_Standart;
 using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
 using NOVGUBots.Moduls.NOVGU_SiteData.Model;
+using NOVGUBots.SettingCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,33 +80,35 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
         static DataNOVGU()
         {
             var Texts = schedules.Select(x => x.Name);
-            if (SettingCore.NOVGUSetting.langs != null)
-                foreach (var lang in SettingCore.NOVGUSetting.langs)
+            if (NOVGUSetting.langs != null)
+                foreach (var lang in NOVGUSetting.langs)
                     Text.MultiTranslate(lang, Texts);
 
             string PatchFile = Path.Combine(PatcSaveInfo, NameFileSchedules);
             if (File.Exists(PatchFile))
                 (schedules, UserTeachers) = JsonConvert.DeserializeObject<(SchedulePage[], UserTeacher[])>(File.ReadAllText(PatchFile));
             else
-                LoadNewData(ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute);
+                LoadNewData(ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute, NOVGUSetting.langs);
         }
         public static void Start() { }
-        public static void LoadNewData(ParalelSetting? paralelSetting = null)
+        public static void LoadNewData(ParalelSetting? paralelSetting, params Lang.LangTypes[] langs)
         {
             paralelSetting ??= DefaultParalelSetting;
 
             if (paralelSetting.Value.HasFlag(ParalelSetting.Schedule))
-                schedules.AsParallel().ForAll(x => x.UpdateData(GetNewData(x)));
+                schedules.AsParallel().ForAll(x => x.UpdateData(GetNewData(x), langs));
             else
                 foreach (var item in schedules)
-                    item.UpdateData(GetNewData(item));
+                    item.UpdateData(GetNewData(item), langs);
 
             List<object> infoUpdate = new List<object>();
             var NewDataUserTeachers = GetTeachers(new WebClient().DownloadString(UrlTeachers), (ParalelSetting)paralelSetting);
             var UpdateInfoUserTeachers = IUpdated.Update(NewDataUserTeachers, UserTeachers, ref infoUpdate);
             if (UpdateInfoUserTeachers.stateUpdated)
             {
-                UserTeachers = UpdateInfoUserTeachers.newData.Select(x => (UserTeacher)x).ToArray();
+                UserTeacher[] newdataTeacher = UpdateInfoUserTeachers.newData.Select(x => (UserTeacher)x).ToArray();
+                newdataTeacher.AsParallel().ForAll(x => ((ITranslatable)x).Translate(langs));
+                UserTeachers = newdataTeacher;
                 if (EventUpdateUserTeachers != null)
                 {
                     try
@@ -134,6 +139,26 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
                 TypePars.Session => Session,
                 _ => null
             };
+        }
+
+        public static object GetScheduleUser(ModelUser user)
+        {
+            if (UserRegister.GetInfoRegisterUser(user).HasFlag(UserRegister.RegisterState.GroupOrTeacherSet))
+            {
+                if (UserRegister.GetUserState(user) == UserRegister.UserState.Student)
+                {
+                    string NameInstituteCollege = UserRegister.GetNameInstituteCollege(user);
+                    string NameCourse = UserRegister.GetNameCourse(user);
+                    string NameGroup = UserRegister.GetNameGroup(user);
+                    return GetInfoScheduleInstitute(UserRegister.GetTypeSchedule(user)).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)?.groups?.FirstOrDefault(x => x.Name == NameGroup)?.tableSchedule;
+                }
+                else
+                {
+                    string NameIdUser = UserRegister.GetUser(user);
+                    return UserTeachers?.FirstOrDefault(x => x.User.IdString == NameIdUser)?.Schedule;
+                }
+            }
+            return null;
         }
     }
 }

@@ -13,49 +13,66 @@ namespace NOVGUBots.SettingCore
 {
     public class SettingManagerPage : ISettingManagerPage
     {
-        private static readonly ModelMarkerTextData textSetButtons = new(CreatePageAppStandart.NameApp, "MainTextNOVGU", 0);
+        private static readonly ModelMarkerTextData textSetButtons = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 0);
         private static readonly CommandList commandListNewUser;
         private static readonly CommandList commandList;
+        private static readonly KitButton buttonsDefaut;
 
         static SettingManagerPage()
         {
-            ObjectCommand backPage = new ObjectCommand((inBot, degreeSimilarity, data) => { ManagerPage.SetBackPage(inBot); return true; }, textSetButtons.GetElemNewId(10));
-            ObjectCommand GetKeyboard = new ObjectCommand((inBot, degreeSimilarity, data) => { ManagerPage.ResetSendKeyboard(inBot); ManagerPage.ResetSendLastMessage(inBot); return true; }, "/keyboard");
+            ModelMarkerTextData ButtonTextBack = textSetButtons.GetElemNewId(10);
+            ObjectCommand backPage = new ObjectCommand((inBot, degreeSimilarity, data) => { ManagerPage.SetBackPage(inBot); return true; }, ButtonTextBack);
+            ObjectCommand GetKeyboard = new ObjectCommand((inBot, degreeSimilarity, data) =>
+            {
+                if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
+                {
+                    ManagerPage.SendDataBot(new ObjectDataMessageSend(inBot) { ButtonsKeyboard = App.NOVGU_Standart.Pages.PageStart.ButtonMessage_NewUser }, false, ManagerPage.GetPageUser(inBot));
+                }
+                else
+                    ManagerPage.ResetSendKeyboard(inBot);
+                ManagerPage.ResetSendLastMessage(inBot);
+                return true;
+            }, "/keyboard");
             ObjectCommand GetLastMessage = new ObjectCommand((inBot, degreeSimilarity, data) => { ManagerPage.ResetSendLastMessage(inBot); return true; }, "/lastmessage"); ;
+
+            commandList = new CommandList(new ObjectCommand[]
+            {
+                backPage,
+                GetKeyboard,
+                GetLastMessage,
+                new ObjectCommand((inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, CreatePageAppStandart.NamePage_Setting); return true; }, textSetButtons.GetElemNewId(50)),
+                new ObjectCommand((inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, CreatePageAppStandart.NamePage_Main); return true; },textSetButtons.GetElemNewId(49))
+            });
             commandListNewUser = new CommandList(new ObjectCommand[]
             {
                 backPage,
                 GetKeyboard,
                 GetLastMessage
             });
-            commandList = new CommandList(new ObjectCommand[]
+            buttonsDefaut = new(new Button[][]
             {
-                backPage,
-                GetKeyboard,
-                GetLastMessage
+                new Button[]
+                {
+                    new Button(textSetButtons.GetElemNewId(50), Ocommand: null),
+                    new Button(textSetButtons.GetElemNewId(49), Ocommand: null)
+                },
+                new Button[]
+                {
+                    new Button(ButtonTextBack, Ocommand: null)
+                },
             });
         }
         public (string NameApp, string NamePage, object SendDataPage) GetPageCreteUser(ObjectDataMessageInBot inBot) => (CreatePageAppStandart.NameApp, CreatePageAppStandart.NamePage_SetLanguage, true);
         public (string NameApp, string NamePage, object SendDataPage) GetPageNonHistoryPage(ObjectDataMessageInBot inBot)
         {
             if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
-            {
                 return (CreatePageAppStandart.NameApp, CreatePageAppStandart.NamePage_RegisterMain, null);
-            }
-            //TODO указать главную страницу (в разработке)
-            return default;
+            else
+                return (CreatePageAppStandart.NameApp, CreatePageAppStandart.NamePage_Main, null);
         }
         public Action<ObjectDataMessageInBot> GetRegisterMethod(ObjectDataMessageInBot inBot) => RegisterUser;
-        public CommandList GetSpecialCommand(ObjectDataMessageInBot inBot)
-        {
-            if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser) && (inBot.BotUser.Page.NameApp == CreatePageAppStandart.NameApp && inBot.BotUser.Page.NamePage != CreatePageAppStandart.NamePage_SetLanguage && inBot.BotUser.Page.NamePage != CreatePageAppStandart.NamePage_StartNewUser))
-                return commandListNewUser;
-            else if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.GroupSet))
-                return commandList;
-            else
-                return null;
-        }
-        public Button[][] GetStandartButtons(ObjectDataMessageInBot inBot) => null;
+        public CommandList GetSpecialCommand(ObjectDataMessageInBot inBot) => UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser) ? commandListNewUser : commandList;
+        public Button[][] GetStandartButtons(ObjectDataMessageInBot inBot) => UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser) ? null : buttonsDefaut;
         public string GetTextCreteUser(ObjectDataMessageInBot inBot) => null;
         public string GetTextSetButtons(ObjectDataMessageInBot inBot) => textSetButtons.GetText(inBot);
         public bool SetStandartButtonsCreteUser(ObjectDataMessageInBot inBot) => false;

@@ -25,7 +25,6 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 39);
         private static readonly ModelMarkerTextData Message_TextTimeInfo = Message_TextStart.GetElemNewId(40);
-        private static readonly ModelMarkerTextData Message_TextCodeError = Message_TextStart.GetElemNewId(41);
         private static readonly KitButton MessageButtons = new(new Button[][]
             {
                 new Button[]
@@ -83,7 +82,6 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 } while (second < TimeTesetSend && isSendingStatusMessage);
                 if (isSendingStatusMessage)
                     SendDataBot(new ObjectDataMessageSend(inBot) { Text = Student.Main.GetTextMainFormat(HistorySet, string.Format(Message_TextStart.GetText(inBot), email, string.Empty), inBot), ButtonsMessage = MessageButtons });
-                StatePage = true;
                 inBot.User[FiledNameStatePage] = true;
             });
         }
@@ -97,22 +95,29 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 sendTime = DateTime.Now;
                 inBot.User[FiledNameDateTime] = sendTime;
                 AuthorizationMailing.Send(Code, "", email, user.Name, inBot);
+                StatePage = true;
             }
         }
         public override void EventInMessage(ObjectDataMessageInBot inBot)
         {
             if (StatePage && inBot.MessageText == Code)
             {
-                StatePage = true;
                 inBot.User[FiledNameDateTime] = null;
                 inBot.User[FiledNameCode] = null;
                 inBot.User[FiledNameStatePage] = null;
                 UserRegister.AddFlag(UserRegister.RegisterState.ConnectNovgu, inBot);
+
                 if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
                 {
                     UserRegister.RemoveFlag(UserRegister.RegisterState.NewUser, inBot);
                     ManagerPage.ClearHistoryPage(inBot);
+                    ManagerPage.ResetSendKeyboard(inBot);
                     ManagerPage.SetPage(inBot, CreatePageAppStandart.NameApp, CreatePageAppStandart.NamePage_Main);
+                }
+                else
+                {
+                    ManagerPage.ClearHistoryListPage(inBot, 1);
+                    ManagerPage.SetBackPage(inBot);
                 }
             }
             else

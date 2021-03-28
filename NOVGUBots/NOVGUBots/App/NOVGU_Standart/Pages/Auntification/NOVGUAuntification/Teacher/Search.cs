@@ -5,8 +5,6 @@ using System;
 using BotsCore.Moduls.Translate;
 using NOVGUBots.Moduls.NOVGU_SiteData;
 using System.Linq;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
 using BotsCore;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Teacher
@@ -46,10 +44,10 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Te
         {
             if (info != null && info.Any())
             {
-                var dataSearch = DataNOVGU.UserTeachers.Where(x => Enumerable.SequenceEqual(GetWords(x.User.Name).Select(x => x.First()), info))?.ToArray();
+                var dataSearch = IsConfirmationUser.FilterUsers(DataNOVGU.UserTeachers.Where(x => Enumerable.SequenceEqual(GetWords(x.User.Name).Select(x => x.First()), info))?.Select(x => x.User).ToArray());
                 if (dataSearch?.Any() ?? false)
                 {
-                    searchUsersButton = KitButton.GenerateKitButtonsTexts(dataSearch.Select(x => new string[] { x.User.Name }).ToArray(), CommandInvoke, 1d);
+                    searchUsersButton = KitButton.GenerateKitButtonsTexts(dataSearch.Select(x => new string[] { x.Name }).ToArray(), CommandInvoke, 1d);
                     NameUser = info;
                 }
             }
@@ -58,7 +56,8 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Te
         private void CommandInvoke(ObjectDataMessageInBot inBot, string text, object data)
         {
             UserRegister.SetUser(DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.Name == text).User.IdString, inBot);
-            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, IsConfirmationUser.NamePage, new Text[] { new Text(inBot, text) });
+            UserRegister.AddFlag(UserRegister.RegisterState.GroupOrTeacherSet, inBot);
+            IsConfirmationUser.SetNextPageStudentOrTeacer(inBot, 0, new Text[] { new Text(inBot, text) });
         }
 
         public override void ResetLastMessenge(ObjectDataMessageInBot inBot)

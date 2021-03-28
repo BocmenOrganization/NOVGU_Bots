@@ -47,7 +47,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
         {
             if (!StateAuntification)
             {
-                if (ManagerUser.SearchUser((x)=>x.Login == inBot.MessageText) != default)
+                if (!string.IsNullOrWhiteSpace(inBot.MessageText) && ManagerUser.SearchUser((x) => x.Login == inBot.MessageText) != default)
                 {
                     Login = inBot.MessageText;
                     StateAuntification = true;
@@ -63,11 +63,14 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
             else
             {
                 ModelUser user = ManagerUser.SearchUser((x) => (x.Password == Login) && (x.Password == inBot.MessageText));
-                if (user != null)
+                if (!string.IsNullOrWhiteSpace(inBot.MessageText) && user != null)
                 {
                     user.AddModelBotUser(inBot);
                     user.LoadToDataBD();
                     inBot.User.DeliteUserBot(inBot.BotID);
+                    if (inBot.User.Lang != user.Lang)
+                        ManagerPage.ResetSendKeyboard(new ObjectDataMessageInBot(user, inBot.BotUser));
+                    inBot.User.Lang = user.Lang;
                     ManagerPage.SetBackPage(inBot);
                 }
                 else

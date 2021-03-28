@@ -37,7 +37,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
             string NameInstituteCollege = UserRegister.GetNameInstituteCollege(inBot);
             string NameCourse = UserRegister.GetNameCourse(inBot);
             string NameGroup = UserRegister.GetNameGroup(inBot);
-            return DataNOVGU.GetInfoScheduleInstitute(UserRegister.GetTypeSchedule(inBot)).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)?.groups?.FirstOrDefault(x => x.Name == NameGroup)?.users;
+            return IsConfirmationUser.FilterUsers(DataNOVGU.GetInfoScheduleInstitute(UserRegister.GetTypeSchedule(inBot)).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)?.groups?.FirstOrDefault(x => x.Name == NameGroup)?.users);
         }
         private void CommandInvoke(ObjectDataMessageInBot inBot, string text, object data)
         {

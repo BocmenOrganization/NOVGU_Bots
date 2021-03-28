@@ -41,9 +41,10 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         private void CommandInvoke(ObjectDataMessageInBot inBot, string text, object data)
         {
             UserRegister.SetNameGroup(text, inBot);
+            UserRegister.AddFlag(UserRegister.RegisterState.GroupOrTeacherSet, inBot);
             Array.Resize(ref HistorySet, HistorySet.Length + 1);
-            HistorySet[HistorySet.Length - 1] = new Text(inBot, text);
-            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, IsConfirmationUser.NamePage, HistorySet);
+            HistorySet[^1] = new Text(inBot, text);
+            IsConfirmationUser.SetNextPageStudentOrTeacer(inBot, 4, HistorySet);
         }
 
         public override void EventInMessage(ObjectDataMessageInBot inBot)

@@ -168,9 +168,9 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 
         public override string ToString() => (typePars == TypePars.College ? $"id-Название: {Id}" : $"Id: {Id}, Название: {Name}") + $" Тип: {typePars}";
 
-        public IEnumerable<Text> GetTextsTranslate()
+        public List<Text> GetTextsTranslate()
         {
-            List<Text> texts = new List<Text>() { Name };
+            List<Text> texts = new() { Name };
             if (Courses != null)
                 foreach (var item in Courses)
                     texts.AddRange(item.GetTextsTranslate());

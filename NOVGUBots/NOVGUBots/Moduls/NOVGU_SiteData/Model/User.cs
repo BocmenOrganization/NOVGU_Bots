@@ -81,6 +81,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.CookieContainer = cookiesPars == default ? new CookieContainer() : cookiesPars;
             request.Method = "GET";
+            request.Timeout = 600000;
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             return response;
         }
@@ -89,11 +90,12 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create($"https://www.novsu.ru/person/{id}/");
             try
             {
+                req.Timeout = 300000;
                 req.GetResponse();
             }
             catch (WebException e)
             {
-                if (e.Response.Headers.AllKeys.Contains("Location"))
+                if (e.Response?.Headers.AllKeys.Contains("Location") ?? false)
                 {
                     return e.Response.Headers["Location"];
                 }

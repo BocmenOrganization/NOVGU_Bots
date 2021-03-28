@@ -25,7 +25,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         public InstituteCollege[] Institute { get; private set; } = Array.Empty<InstituteCollege>();
 
         public SchedulePage(Text name, string urlPage, TypePars typeInstitute) => (Name, Url, TypeInstitute) = (name, urlPage, typeInstitute);
-        public void UpdateData(InstituteCollege[] newData)
+        public void UpdateData(InstituteCollege[] newData, Lang.LangTypes[] langs)
         {
             List<object> listUpdate = null;
             if (Institute.Length > 0)
@@ -40,6 +40,14 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
                 SetDataInstitute(newData);
             void SetDataInstitute(InstituteCollege[] instituteColleges)
             {
+                if (langs != null && instituteColleges != null)
+                {
+                    instituteColleges.AsParallel().ForAll(x => ((ITranslatable)x).Translate(langs));
+                    foreach (var lang in langs)
+                        Name.GetText(lang);
+                }
+                
+
                 lock (Institute)
                 {
                     Institute = instituteColleges;

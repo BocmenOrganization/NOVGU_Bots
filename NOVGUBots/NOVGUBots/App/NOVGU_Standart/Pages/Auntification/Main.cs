@@ -91,9 +91,9 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification
                     registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet) ? (0, 0) : null,
                     // Зарегестрироваться
                     registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet) ? (0, 1) : null,
-                    // Отсоеденить акк  Это есть у всех
-                    // Удалить акк
-                    (!registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet)) ? (0, 3) : null,
+                    // Отсоеденить акк
+                    registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet) && inBot.User.BotsAccount?.Count > 1 ? null : (0, 2),
+                    // Удалить акк у всех
                     // Пропустить
                     (registerState.HasFlag(UserRegister.RegisterState.NewUser) && !registerState.HasFlag(UserRegister.RegisterState.LoginPasswordSet)) ? null : (0, 4),
                     // Далее

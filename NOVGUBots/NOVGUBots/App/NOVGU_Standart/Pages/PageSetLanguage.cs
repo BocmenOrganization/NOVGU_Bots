@@ -32,8 +32,22 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
             });
             static void SetLang(ObjectDataMessageInBot inBot, Lang.LangTypes lang, object data)
             {
+                if (inBot.User.Lang != lang)
+                {
+                    inBot.User.Lang = lang;
+                    ManagerPage.ResetSendKeyboard(inBot);
+                    foreach (var userbot in inBot.User.BotsAccount)
+                    {
+                        if (userbot != inBot.BotUser)
+                        {
+                            ObjectDataMessageInBot botsUserItem = new ObjectDataMessageInBot(inBot.User, userbot);
+                            ManagerPage.ResetSendKeyboard(botsUserItem);
+                            ManagerPage.ResetSendLastMessage(botsUserItem);
+                        }
+                    }
+                }
                 inBot.User.Lang = lang;
-                if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.ConnectNovgu))
+                if (!UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
                     ManagerPage.SetBackPage(inBot);
                 else
                 {
@@ -52,7 +66,6 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
                 SendMessage(inBot);
         }
         public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendMessage(inBot);
-        public override bool IsSendStandartButtons(ObjectDataMessageInBot inBot) => UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.ConnectNovgu);
         private void SendMessage(ObjectDataMessageInBot inBot) => SendDataBot(new ObjectDataMessageSend(inBot) { TextObj = Message_TextStart, ButtonsMessage = Button_MessageLangsList });
     }
 }
