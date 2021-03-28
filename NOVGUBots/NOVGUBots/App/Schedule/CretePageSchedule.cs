@@ -16,6 +16,7 @@ namespace NOVGUBots.App.Schedule
         public const string NameApp = "ScheduleApp";
         public const string NameTableText = "ScheduleAppText";
         public const string NameMainPage = "MainPage";
+        public const string NamePageSchedule = "Schedule";
 
         private static readonly ModelMarkerTextData NameButtonOpenSchedule = new(NameApp, NameTableText, 0);
         private static readonly (string AppName, string PageName, Text NameButton)[] SetButtonsMain = new (string AppName, string PageName, Text NameButton)[]
@@ -29,7 +30,9 @@ namespace NOVGUBots.App.Schedule
         {
             return name switch
             {
-                NameMainPage => (IsScheduleFile(inBot)) ? new MainScheduleFile() : new MainScheduleText()
+                NameMainPage => (IsScheduleFile(inBot)) ? new MainScheduleFile() : new MainScheduleText(),
+                NamePageSchedule => new Pages.Schedule(),
+                _ => null
             };
         }
         private static bool IsScheduleFile(ModelUser user) => DataNOVGU.GetScheduleUser(user) is TableScheduleStudents tableStudent && tableStudent.typeSchedule == TableScheduleStudents.TypeSchedule.Files;
@@ -38,7 +41,9 @@ namespace NOVGUBots.App.Schedule
         {
             return name switch
             {
-                NameMainPage => (IsScheduleFile(inBot)) ? typeof(MainScheduleFile) : typeof(MainScheduleText)
+                NameMainPage => (IsScheduleFile(inBot)) ? typeof(MainScheduleFile) : typeof(MainScheduleText),
+                NamePageSchedule => typeof(Pages.Schedule),
+                _ => null
             };
         }
 
