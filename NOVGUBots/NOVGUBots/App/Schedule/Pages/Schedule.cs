@@ -1,26 +1,35 @@
 ﻿using BotsCore.Bots.Model;
 using BotsCore.Moduls.Tables.Services;
-using BotsCore.Bots.Model.Buttons;
 using System;
 using BotsCore.Moduls.Translate;
-using NOVGUBots.Moduls.NOVGU_SiteData;
-using System.Linq;
 using BotsCore;
+using static NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule.Hendler;
 
 namespace NOVGUBots.App.Schedule.Pages
 {
     public class Schedule : Page
     {
         private static readonly ModelMarkerTextData Message_TextStartMain = new(CretePageSchedule.NameApp, CretePageSchedule.NameTableText, 7);
-
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public DateTime[] dates;
+        public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
         {
-            throw new NotImplementedException();
+            if (dataOpenPage is DateTime[] dates)
+            {
+                this.dates = dates;
+                ResetLastMessenge(inBot);
+            }
+            else
+                ManagerPage.SetBackPage(inBot);
         }
 
-        public override void ResetLastMessenge(ObjectDataMessageInBot inBot)
+        public override void EventInMessage(ObjectDataMessageInBot inBot) => ResetLastMessenge(inBot);
+
+        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(StaticData.GetSendMessage(inBot, GenereteUrlTelegram, dates));
+        private static string GenereteUrlTelegram(Href href, Lang.LangTypes lang)
         {
-            throw new NotImplementedException();
+            if (href != null && href.Text != null && !string.IsNullOrWhiteSpace(href.Url))
+                return $"[{href.Text.GetText(lang)}]({href.Url})";
+            return null;
         }
     }
 }

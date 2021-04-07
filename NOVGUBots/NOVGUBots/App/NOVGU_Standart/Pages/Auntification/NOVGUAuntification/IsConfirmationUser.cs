@@ -75,6 +75,6 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 ManagerPage.SetBackPage(inBot);
             }
         }
-        public static Moduls.NOVGU_SiteData.Model.User[] FilterUsers(Moduls.NOVGU_SiteData.Model.User[] users) => users?.Where(x => (!string.IsNullOrWhiteSpace(x.Email)) && ManagerUser.SearchUser((u) => UserRegister.GetUser(u) == x.IdString) == null)?.ToArray();
+        public static Moduls.NOVGU_SiteData.Model.User[] FilterUsers(Moduls.NOVGU_SiteData.Model.User[] users) => users?.Where(x => (!string.IsNullOrWhiteSpace(x.Email)) && ManagerUser.SearchUser((u) => (UserRegister.GetUser(u) == x.IdString && UserRegister.GetInfoRegisterUser(u).HasFlag(UserRegister.RegisterState.ConnectNovgu))) == null)?.ToArray();
     }
 }

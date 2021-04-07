@@ -17,6 +17,8 @@ namespace NOVGUBots.App.Schedule
         public const string NameTableText = "ScheduleAppText";
         public const string NameMainPage = "MainPage";
         public const string NamePageSchedule = "Schedule";
+        public const string NameTableMedia = "ScheduleAppMedia";
+        public const string NameTableString = "ScheduleAppString";
 
         private static readonly ModelMarkerTextData NameButtonOpenSchedule = new(NameApp, NameTableText, 0);
         private static readonly (string AppName, string PageName, Text NameButton)[] SetButtonsMain = new (string AppName, string PageName, Text NameButton)[]

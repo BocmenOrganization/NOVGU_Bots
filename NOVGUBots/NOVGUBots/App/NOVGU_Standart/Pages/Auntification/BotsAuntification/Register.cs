@@ -37,6 +37,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
         /// </summary>
         public bool StateRegister;
         public byte LastMessageID;
+        public string Login;
 
         public override KitButton GetKeyboardButtons(ObjectDataMessageInBot inBot) => UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser) ? PageStart.ButtonMessage_NewUser : null;
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage) => ResetLastMessenge(inBot);
@@ -54,7 +55,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
                 {
                     if (CheckLoginBusy(inBot.MessageText))
                     {
-                        inBot.User.Login = inBot.MessageText;
+                        Login = inBot.MessageText;
                         StateRegister = true;
                         LastMessageID = 1;
                         ResetLastMessenge(inBot);
@@ -76,15 +77,19 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
                 // Установка пароля
                 if (CheckCorrectLoginAndPassword(inBot.MessageText))
                 {
-                    inBot.User.Password = inBot.MessageText;
-                    UserRegister.AddFlag(UserRegister.RegisterState.LoginPasswordSet, inBot);
-                    if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
+                    if (CheckLoginBusy(Login))
                     {
-                        ManagerPage.ClearHistoryListPage(inBot, 1);
-                        ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NOVGUAuntification.BindingNOVGU.NamePage);
+                        inBot.User.Login = Login;
+                        inBot.User.Password = inBot.MessageText;
+                        UserRegister.AddFlag(UserRegister.RegisterState.LoginPasswordSet, inBot);
+                        if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
+                        {
+                            ManagerPage.ClearHistoryListPage(inBot, 1);
+                            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NOVGUAuntification.BindingNOVGU.NamePage);
+                        }
+                        else
+                            ManagerPage.SetBackPage(inBot);
                     }
-                    else
-                        ManagerPage.SetBackPage(inBot);
                 }
                 else
                 {

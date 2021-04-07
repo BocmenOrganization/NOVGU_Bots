@@ -13,6 +13,7 @@ namespace NOVGUBots.App.NOVGU_Standart
         private const string NameFiledNameGroup = "NameGroup";
         private const string NameFiledIdUser = "IdUserNOVGU";
         private const string NameFiledUserState = "UserState";
+
         public static RegisterState GetInfoRegisterUser(ModelUser user)
         {
             if (user[NameFiledRegisterInfo] is RegisterState resul)
@@ -22,9 +23,6 @@ namespace NOVGUBots.App.NOVGU_Standart
             else
                 return RegisterState.NewUser;
         }
-        public static void SetRegister(RegisterState registerState, ModelUser user) => user[NameFiledRegisterInfo] = registerState;
-        public static void AddFlag(RegisterState registerState, ModelUser user) => SetRegister(GetInfoRegisterUser(user) | registerState, user);
-        public static void RemoveFlag(RegisterState registerState, ModelUser user) => SetRegister(GetInfoRegisterUser(user) & ~registerState, user);
         public static TypePars GetTypeSchedule(ModelUser user)
         {
             if (user[NameFiledTypeSchedule] is TypePars resul)
@@ -34,16 +32,10 @@ namespace NOVGUBots.App.NOVGU_Standart
             else
                 return TypePars.InstituteFullTime;
         }
-        public static void SetTypeSchedule(TypePars type, ModelUser user) => user[NameFiledTypeSchedule] = type;
         public static string GetNameInstituteCollege(ModelUser user) => (string)user[NameFiledNameInstituteCollege];
-        public static void SetNameInstituteCollege(string name, ModelUser user) => user[NameFiledNameInstituteCollege] = name;
-        public static string GetNameCourse(ModelUser user) => (string)user[NameFiledNameCourse];
-        public static void SetNameCourse(string name, ModelUser user) => user[NameFiledNameCourse] = name;
         public static string GetNameGroup(ModelUser user) => (string)user[NameFiledNameGroup];
-        public static void SetNameGroup(string name, ModelUser user) => user[NameFiledNameGroup] = name;
-        public static void SetUser(string id, ModelUser user) => user[NameFiledIdUser] = id;
         public static string GetUser(ModelUser user) => (string)user[NameFiledIdUser];
-        public static void SetUserState(UserState userState, ModelUser user) => user[NameFiledUserState] = userState;
+        public static string GetNameCourse(ModelUser user) => (string)user[NameFiledNameCourse];
         public static UserState GetUserState(ModelUser user)
         {
             if (user[NameFiledUserState] is UserState resul)
@@ -52,6 +44,19 @@ namespace NOVGUBots.App.NOVGU_Standart
                 return (UserState)resLong;
             else
                 return UserState.Student;
+        }
+
+        public static void SetRegister(RegisterState registerState, ModelUser user) => user[NameFiledRegisterInfo] = registerState;
+        public static void AddFlag(RegisterState registerState, ModelUser user) => SetRegister(GetInfoRegisterUser(user) | registerState, user);
+        public static void RemoveFlag(RegisterState registerState, ModelUser user) => SetRegister(GetInfoRegisterUser(user) & ~registerState, user);
+        public static void SetTypeSchedule(TypePars type, ModelUser user) => user[NameFiledTypeSchedule] = type;
+        public static void SetNameInstituteCollege(string name, ModelUser user) => user[NameFiledNameInstituteCollege] = name;
+        public static void SetNameCourse(string name, ModelUser user) => user[NameFiledNameCourse] = name;
+        public static void SetNameGroup(string name, ModelUser user) => user[NameFiledNameGroup] = name;
+        public static void SetUser(string id, ModelUser user) => user[NameFiledIdUser] = id;
+        public static void SetUserState(UserState userState, ModelUser user)
+        {
+            user[NameFiledUserState] = userState;
         }
         [Flags]
         public enum RegisterState : uint

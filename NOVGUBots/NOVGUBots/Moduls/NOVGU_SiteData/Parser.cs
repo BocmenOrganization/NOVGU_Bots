@@ -1,12 +1,8 @@
 ﻿using HtmlAgilityPack;
 using NOVGUBots.Moduls.NOVGU_SiteData.Model;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
-using static NOVGUBots.Moduls.NOVGU_SiteData.Model.InstituteCollege;
-using Newtonsoft.Json;
 using System;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData
@@ -71,6 +67,14 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
                 return UrlTeachers?.AsParallel().Select(x => new UserTeacher(x.url, x.name)).ToArray();
             else
                 return UrlTeachers?.Select(x => new UserTeacher(x.url, x.name)).ToArray();
+        }
+        public static DateTime[][][] GetCalendar(string Html)
+        {
+            HtmlDocument htmlDocument = new();
+            htmlDocument.LoadHtml(Html);
+            HtmlNodeCollection htmlNodes = htmlDocument.DocumentNode.SelectNodes("//div[@id='npe_instance_1103492_npe_content']/div[@class='block_3padding']/table//td");
+            uint @switch = 0;
+            return htmlNodes?.Where((x, i) => i % 2 != 0).Select(x => x.InnerText.Split("-")?.Select(x => DateTime.Parse(x)).ToArray()).GroupBy(x => ++@switch % 2 == 0).Select(x => x?.ToArray()).ToArray();
         }
         public static string ClearText(string text) => string.Join(" ", Regex.Replace(text, @"[\r\n\t]", "")?.Split(' ')?.Where(x => !string.IsNullOrWhiteSpace(x)));
         [Flags]

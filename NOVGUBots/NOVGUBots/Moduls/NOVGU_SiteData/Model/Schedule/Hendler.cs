@@ -56,15 +56,17 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
                 if (typePars != TypePars.Teacher)
                     numGroup[countLine - 1] = ClearText(nodes[1 - offset - offsetType].InnerText);
                 subject[countLine - 1] = new Text(Lang.LangTypes.ru, ClearText(nodes[2 - offset - offsetType].InnerText));
-                who[countLine - 1] = GetHref(ref document, nodes[3 - offset - offsetType], typePars == TypePars.Teacher);
-                auditorium[countLine - 1] = GetHref(ref document, nodes[4 - offset - offsetType], true);
+                who[countLine - 1] = GetHref(ref document, nodes[3 - offset - offsetType], typePars == TypePars.Teacher, $"{Host}/univer/timetable/ochn/i.1103357/");
+                if (!(typePars == TypePars.Teacher) && who[countLine - 1] != null)
+                    who[countLine - 1] = new Href() { Text = who[countLine - 1].Text, Url = GetUrlTeacher(who[countLine - 1].Url) };
+                auditorium[countLine - 1] = GetHref(ref document, nodes[4 - offset - offsetType], true, $"{Host}/univer/timetable/ochn/i.1103357/");
                 comment[countLine - 1] = GetHref(ref document, nodes[5 - offset - offsetType]);
 
-                static Href GetHref(ref HtmlDocument document, HtmlNode startNode, bool LockText = false)
+                static Href GetHref(ref HtmlDocument document, HtmlNode startNode, bool LockText = false, string appendUrlHost = null)
                 {
                     string text = ClearText(startNode.InnerText);
                     if (!string.IsNullOrWhiteSpace(text))
-                        return new() { Text = new Text(Lang.LangTypes.ru, text) { LockTranslator = LockText }, Url = document.DocumentNode.SelectSingleNode(startNode.XPath + "/a[@href]")?.Attributes["href"].Value };
+                        return new() { Text = new Text(Lang.LangTypes.ru, text) { LockTranslator = LockText }, Url = appendUrlHost + document.DocumentNode.SelectSingleNode(startNode.XPath + "/a[@href]")?.Attributes["href"].Value };
                     return null;
                 }
                 if (countLine > 1)
@@ -78,6 +80,14 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
                 resul.Add((times, numGroup?.Reverse().Where(x => !string.IsNullOrWhiteSpace(x))?.ToArray(), subject?.Reverse().ToArray(), who?.Reverse().ToArray(), auditorium?.Reverse().ToArray(), comment.Reverse()?.ToArray()));
             }
             return resul?.ToArray();
+        }
+        private static string GetUrlTeacher(string url)
+        {
+            if (url == null || !(url.Contains("ora_") && url.Contains('&')))
+                return null;
+            url = url.Remove(0, url.IndexOf("ora_") + 4);
+            url = url.Substring(0, url.IndexOf('&'));
+            return $"{Host}/person/{url}";
         }
         private static DateTime[] GetInstituteTimesPeriod(HtmlDocument htmlDocument, TypePars typePars)
         {
@@ -149,8 +159,16 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
             public Text Text;
             public string Url;
             public string GetId() => $"{Text.GetDefaultText()}{Url}";
-            public static bool operator ==(Href t1, Href t2) => (t1.Text == t2.Text) && (t1.Url == t2.Url);
+            public static bool operator ==(Href t1, Href t2) => (t1?.Text == t2?.Text) && (t1?.Url == t2?.Url);
             public static bool operator !=(Href t1, Href t2) => !(t1 == t2);
+            public static bool operator ==(Href t1, object t2)
+            {
+                if (t2 is Href t3)
+                    return t1 == t3;
+                return false;
+            }
+            public static bool operator !=(Href t1, object t2) => !(t1 == t2);
+
             public override string ToString() => Text.GetDefaultText();
 
             public override bool Equals(object obj)
@@ -159,6 +177,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
                     return href == this;
                 return false;
             }
+            public override int GetHashCode() => Url.GetHashCode();
         }
         public class DayStudents : IUpdated
         {
@@ -241,7 +260,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
         {
             [JsonProperty]
             public string[] NumGroup { get; private set; }
-            public LineStudents(string[] NumGroup, DateTime[] TimeStartEnd, Text[] Subject, Href[] Auditorium, Href[] Who, Href[] Comment) : base(TimeStartEnd, Subject, Auditorium, Who, Comment) => this.NumGroup = NumGroup;
+            public LineStudents(string[] NumGroup, DateTime[] TimeStartEnd, Text[] Subject, Href[] Auditorium, Href[] Who, Href[] Comment) : base(TimeStartEnd, Subject, Auditorium, Who, Comment) => this.NumGroup = NumGroup.Distinct().ToArray();
             [JsonConstructor]
             private LineStudents() { }
         }
@@ -258,7 +277,14 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
             [JsonProperty]
             public Href[] Comment { get; protected set; }
 
-            public LineTeacher(DateTime[] TimeStartEnd, Text[] Subject, Href[] Auditorium, Href[] Who, Href[] Comment) => (this.TimeStartEnd, this.Subject, this.Auditorium, this.Who, this.Comment) = (TimeStartEnd, Subject, Auditorium, Who, Comment);
+            public LineTeacher(DateTime[] TimeStartEnd, Text[] Subject, Href[] Auditorium, Href[] Who, Href[] Comment)
+            {
+                this.TimeStartEnd = TimeStartEnd;
+                this.Subject = Subject.Distinct().ToArray();
+                this.Auditorium = Auditorium.Distinct().ToArray();
+                this.Who = Who.Distinct().ToArray();
+                this.Comment = Comment.Distinct().ToArray();
+            }
             [JsonConstructor]
             protected LineTeacher() { }
             public bool Similarity(object e)

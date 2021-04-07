@@ -18,12 +18,13 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
 {
     public static class DataNOVGU
     {
+        private const string UrlCalendar = "https://www.novsu.ru/study/";
         private const string UrlTeachers = "https://www.novsu.ru/univer/timetable/ochn/i.1103357/?page=allTeachersTimetable";
         public const string PatcSaveInfo = "NOVGUParserData";
         public const string NameFileSchedules = "FileSchedules.json";
 
 #pragma warning disable CA2211 // Поля, не являющиеся константами, не должны быть видимыми
-        public static ParalelSetting DefaultParalelSetting = ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute;
+        public static ParalelSetting DefaultParalelSetting = ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course;
 #pragma warning restore CA2211 // Поля, не являющиеся константами, не должны быть видимыми
 
         private static readonly SchedulePage[] schedules = new SchedulePage[]
@@ -35,6 +36,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
         };
         public static UserTeacher[] UserTeachers { get; private set; }
         public static Update EventUpdateUserTeachers { get; set; }
+        public static DateTime[][][] Calendar { get; private set; }
 
         /// <summary>
         /// Очников (институт)
@@ -86,7 +88,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
 
             string PatchFile = Path.Combine(PatcSaveInfo, NameFileSchedules);
             if (File.Exists(PatchFile))
-                (schedules, UserTeachers) = JsonConvert.DeserializeObject<(SchedulePage[], UserTeacher[])>(File.ReadAllText(PatchFile));
+                (schedules, UserTeachers, Calendar) = JsonConvert.DeserializeObject<(SchedulePage[], UserTeacher[], DateTime[][][])>(File.ReadAllText(PatchFile));
             else
                 LoadNewData(ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute, NOVGUSetting.langs);
         }
@@ -122,10 +124,12 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
                 }
             }
 
+            Calendar = GetCalendar(new WebClient().DownloadString(UrlCalendar));
+
             if (!Directory.Exists(PatcSaveInfo))
                 Directory.CreateDirectory(PatcSaveInfo);
 
-            File.WriteAllText(Path.Combine(PatcSaveInfo, NameFileSchedules), JsonConvert.SerializeObject((schedules, UserTeachers), Formatting.Indented));
+            File.WriteAllText(Path.Combine(PatcSaveInfo, NameFileSchedules), JsonConvert.SerializeObject((schedules, UserTeachers, Calendar), Formatting.Indented));
 
             InstituteCollege[] GetNewData(SchedulePage schedule) => ParsInstitute(new WebClient().DownloadString(schedule.Url), schedule.TypeInstitute, (Parser.ParalelSetting)paralelSetting);
         }

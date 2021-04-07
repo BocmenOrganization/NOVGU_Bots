@@ -82,7 +82,9 @@ namespace NOVGUBots
                 new ModelTableText(CreatePageAppStandart.NameTableText, NOVGUSetting.langs),
                 new ModelTableUniversal<Media[]>(CreatePageAppStandart.NameTableMedia),
                 new ModelTableString(CreatePageAppStandart.NameTableString),
-                new ModelTableText(App.Schedule.CretePageSchedule.NameTableText)
+                new ModelTableText(App.Schedule.CretePageSchedule.NameTableText),
+                new ModelTableUniversal<Media[]>(App.Schedule.CretePageSchedule.NameTableMedia),
+                new ModelTableString(App.Schedule.CretePageSchedule.NameTableString)
             };
             standartTables = new ModelUpdateTablesInternet
                 (
