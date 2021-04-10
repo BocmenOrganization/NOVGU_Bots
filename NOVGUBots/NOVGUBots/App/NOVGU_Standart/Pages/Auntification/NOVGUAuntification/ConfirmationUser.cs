@@ -8,6 +8,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using BotsCore;
+using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.BindingNOVGU;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 {
@@ -33,16 +34,17 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 }
             });
 
-        public Text[] HistorySet;
         public DateTime sendTime;
         public string Code;
         private Task taskMessage;
         private bool isSendingStatusMessage;
         public bool StatePage;
         private string email;
+        public RegisterInfo registerInfo;
 
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
         {
+            registerInfo = RegisterInfo.Load(dataOpenPage);
             email = GetUser(inBot).Email;
             if (inBot.User[FiledNameOldEmail] is string oldEmail && oldEmail == email)
             {
@@ -53,11 +55,6 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 if (inBot.User[FiledNameStatePage] is bool statePage)
                     StatePage = statePage;
             }
-
-            if (dataOpenPage is Text[] texts)
-                HistorySet = texts;
-            else if (dataOpenPage is JArray valuePairs)
-                HistorySet = valuePairs.ToObject<Text[]>();
             Start(inBot);
         }
         public override void EventStoreLoad(ObjectDataMessageInBot inBot, bool state)
@@ -76,12 +73,12 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 do
                 {
                     second = (DateTime.Now - sendTime).TotalSeconds;
-                    SendDataBot(new ObjectDataMessageSend(inBot) { Text = Student.Main.GetTextMainFormat(HistorySet, string.Format(Message_TextStart.GetText(inBot), email, string.Format(Message_TextTimeInfo.GetText(inBot), TimeTesetSend - (int)second)), inBot) });
+                    SendDataBot(new ObjectDataMessageSend(inBot) { Text = Student.Main.GetTextMainFormat(registerInfo.textsHistory, string.Format(Message_TextStart.GetText(inBot), email, string.Format(Message_TextTimeInfo.GetText(inBot), TimeTesetSend - (int)second)), inBot) });
                     System.Threading.Thread.Sleep(1000);
 
                 } while (second < TimeTesetSend && isSendingStatusMessage);
                 if (isSendingStatusMessage)
-                    SendDataBot(new ObjectDataMessageSend(inBot) { Text = Student.Main.GetTextMainFormat(HistorySet, string.Format(Message_TextStart.GetText(inBot), email, string.Empty), inBot), ButtonsMessage = MessageButtons });
+                    SendDataBot(new ObjectDataMessageSend(inBot) { Text = Student.Main.GetTextMainFormat(registerInfo.textsHistory, string.Format(Message_TextStart.GetText(inBot), email, string.Empty), inBot), ButtonsMessage = MessageButtons });
                 inBot.User[FiledNameStatePage] = true;
             });
         }
@@ -105,8 +102,8 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 inBot.User[FiledNameDateTime] = null;
                 inBot.User[FiledNameCode] = null;
                 inBot.User[FiledNameStatePage] = null;
+                UserRegister.SetRegisterInfo(registerInfo, inBot);
                 UserRegister.AddFlag(UserRegister.RegisterState.ConnectNovgu, inBot);
-
                 if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
                 {
                     UserRegister.RemoveFlag(UserRegister.RegisterState.NewUser, inBot);
@@ -136,18 +133,14 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
         }
 
         private static string GenerateRandomCode() => new string(Enumerable.Range(0, CountCharCode + 1).Select(x => (char)random.Next(65, 122)).ToArray());
-        private static Moduls.NOVGU_SiteData.Model.User GetUser(ObjectDataMessageInBot inBot)
+        private Moduls.NOVGU_SiteData.Model.User GetUser(ObjectDataMessageInBot inBot)
         {
-            string NameIdUser = UserRegister.GetUser(inBot);
-            if (UserRegister.GetUserState(inBot) == UserRegister.UserState.Student)
+            if (registerInfo.userState == UserRegister.UserState.Student)
             {
-                string NameInstituteCollege = UserRegister.GetNameInstituteCollege(inBot);
-                string NameCourse = UserRegister.GetNameCourse(inBot);
-                string NameGroup = UserRegister.GetNameGroup(inBot);
-                return DataNOVGU.GetInfoScheduleInstitute(UserRegister.GetTypeSchedule(inBot)).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)?.groups?.FirstOrDefault(x => x.Name == NameGroup)?.users?.FirstOrDefault(x => x.IdString == NameIdUser);
+                return DataNOVGU.GetInfoScheduleInstitute(registerInfo.type).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == registerInfo.NameInstituteColleg)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == registerInfo.NameCourse)?.groups?.FirstOrDefault(x => x.Name == registerInfo.NameGroup)?.users?.FirstOrDefault(x => x.IdString == registerInfo.UserId);
             }
             else
-                return DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.IdString == NameIdUser).User;
+                return DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.IdString == registerInfo.UserId).User;
         }
     }
 }

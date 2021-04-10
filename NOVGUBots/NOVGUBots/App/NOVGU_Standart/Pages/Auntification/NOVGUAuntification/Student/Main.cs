@@ -25,27 +25,33 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
             {
                 new Button[]
                 {
-                    new Button(DataNOVGU.InstituteFullTime.Name, (inBot, s, data) => { SetType(inBot, TypePars.InstituteFullTime); return true; })
+                    new Button(DataNOVGU.InstituteFullTime.Name, (inBot, s, data) => { SetType(inBot, TypePars.InstituteFullTime, data); return true; })
                 },
                 new Button[]
                 {
-                    new Button(DataNOVGU.InstituteInAbsentia.Name, (inBot, s, data) => { SetType(inBot, TypePars.InstituteInAbsentia); return true; })
+                    new Button(DataNOVGU.InstituteInAbsentia.Name, (inBot, s, data) => { SetType(inBot, TypePars.InstituteInAbsentia, data); return true; })
                 },
                 new Button[]
                 {
-                    new Button(DataNOVGU.College.Name, (inBot, s, data) => { SetType(inBot, TypePars.College); return true; })
+                    new Button(DataNOVGU.College.Name, (inBot, s, data) => { SetType(inBot, TypePars.College, data); return true; })
                 }
             });
-            static void SetType(ObjectDataMessageInBot inBot, TypePars type)
+            static void SetType(ObjectDataMessageInBot inBot, TypePars type, object e)
             {
-                UserRegister.SetTypeSchedule(type, inBot);
-                ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Institute.NamePage);
+                BindingNOVGU.RegisterInfo registerInfo = BindingNOVGU.RegisterInfo.Load(e);
+                registerInfo.type = type;
+                ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Institute.NamePage, registerInfo);
             }
         }
-        public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage) => SendMessage(inBot);
+        public BindingNOVGU.RegisterInfo registerInfo;
+        public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
+        {
+            registerInfo = BindingNOVGU.RegisterInfo.Load(dataOpenPage);
+            SendMessage(inBot);
+        }
         public override void EventInMessage(ObjectDataMessageInBot inBot)
         {
-            if (!kitButton.CommandInvoke(inBot))
+            if (!kitButton.CommandInvoke(inBot, registerInfo))
                 SendMessage(inBot);
         }
         public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendMessage(inBot);

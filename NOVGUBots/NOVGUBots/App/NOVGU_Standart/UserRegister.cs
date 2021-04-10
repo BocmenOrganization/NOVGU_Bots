@@ -1,5 +1,6 @@
 ﻿using BotsCore.User.Models;
 using System;
+using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.BindingNOVGU;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 
 namespace NOVGUBots.App.NOVGU_Standart
@@ -57,6 +58,15 @@ namespace NOVGUBots.App.NOVGU_Standart
         public static void SetUserState(UserState userState, ModelUser user)
         {
             user[NameFiledUserState] = userState;
+        }
+        public static void SetRegisterInfo(RegisterInfo registerInfo, ModelUser user)
+        {
+            SetUserState(registerInfo.userState, user);
+            SetTypeSchedule(registerInfo.type, user);
+            SetNameInstituteCollege(registerInfo.NameInstituteColleg, user);
+            SetNameCourse(registerInfo.NameCourse, user);
+            SetNameGroup(registerInfo.NameGroup, user);
+            SetUser(registerInfo.UserId, user);
         }
         [Flags]
         public enum RegisterState : uint

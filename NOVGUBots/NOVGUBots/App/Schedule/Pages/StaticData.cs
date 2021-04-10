@@ -19,6 +19,40 @@ namespace NOVGUBots.App.Schedule.Pages
         public static readonly ModelMarkerUneversalData<Media[]> MessageMedia_UpWeek = new(CretePageSchedule.NameApp, CretePageSchedule.NameTableMedia, 0);
         public static readonly ModelMarkerUneversalData<Media[]> MessageMedia_DownWeek = MessageMedia_UpWeek.GetElemNewId(1);
         public static readonly ModelMarkerTextData Text_NoDataSchedule = Message_TextUpWeek.GetElemNewId(12);
+        //====================================================== Фото дней недели
+        public static ModelMarkerUneversalData<Media[]>[][] MessageMedia_DayOfWeek = new ModelMarkerUneversalData<Media[]>[][]
+        {
+            new ModelMarkerUneversalData<Media[]>[]
+            {
+                MessageMedia_UpWeek.GetElemNewId(2),
+                MessageMedia_UpWeek.GetElemNewId(3)
+            },
+            new ModelMarkerUneversalData<Media[]>[]
+            {
+                MessageMedia_UpWeek.GetElemNewId(4),
+                MessageMedia_UpWeek.GetElemNewId(5)
+            },
+            new ModelMarkerUneversalData<Media[]>[]
+            {
+                MessageMedia_UpWeek.GetElemNewId(6),
+                MessageMedia_UpWeek.GetElemNewId(7)
+            },
+            new ModelMarkerUneversalData<Media[]>[]
+            {
+                MessageMedia_UpWeek.GetElemNewId(8),
+                MessageMedia_UpWeek.GetElemNewId(9)
+            },
+            new ModelMarkerUneversalData<Media[]>[]
+            {
+                MessageMedia_UpWeek.GetElemNewId(10),
+                MessageMedia_UpWeek.GetElemNewId(11)
+            },
+            new ModelMarkerUneversalData<Media[]>[]
+            {
+                MessageMedia_UpWeek.GetElemNewId(12),
+                MessageMedia_UpWeek.GetElemNewId(13)
+            },
+        };
         //====================================================== Дни недели
         public static readonly ModelMarkerTextData[] DayOfWeek = new ModelMarkerTextData[]
         {
@@ -106,7 +140,13 @@ namespace NOVGUBots.App.Schedule.Pages
             }
         }
 
-        public static ObjectDataMessageSend GetSendMessage(ObjectDataMessageInBot inBot, Func<Href, Lang.LangTypes, string> generateUrlText, params DateTime[] dates) => new ObjectDataMessageSend(inBot) { Text = GetScheduleText(inBot, generateUrlText, dates) };
+        public static ObjectDataMessageSend GetSendMessage(ObjectDataMessageInBot inBot, Func<Href, Lang.LangTypes, string> generateUrlText, params DateTime[] dates)
+        {
+            Media[] medias = null;
+            if (dates.Length == 1)
+                medias = MessageMedia_DayOfWeek[(int)dates.First().DayOfWeek - 1][GetInfo_UpDownWeek() ? 0 : 1];
+            return new ObjectDataMessageSend(inBot) { Text = GetScheduleText(inBot, generateUrlText, dates), media = medias };
+        }
         /// <summary>
         /// Генерация текста с расписанием
         /// </summary>

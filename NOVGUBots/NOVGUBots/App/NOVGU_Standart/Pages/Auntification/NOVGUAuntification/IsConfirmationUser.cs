@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using BotsCore;
 using System.Linq;
 using BotsCore.User;
+using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.BindingNOVGU;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 {
@@ -38,29 +39,29 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 }
             });
 
-        public Text[] HistorySet;
+        public RegisterInfo registerInfo;
 
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
         {
-            if (dataOpenPage is Text[] texts)
-                HistorySet = texts;
-            else if (dataOpenPage is JArray valuePairs)
-                HistorySet = valuePairs.ToObject<Text[]>();
+            registerInfo = RegisterInfo.Load(dataOpenPage);
             ResetLastMessenge(inBot);
         }
         public override void EventInMessage(ObjectDataMessageInBot inBot)
         {
-            if (!MessageButtons.CommandInvoke(inBot, HistorySet))
+            if (!MessageButtons.CommandInvoke(inBot, registerInfo))
                 ResetLastMessenge(inBot);
         }
-        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(new ObjectDataMessageSend(inBot) { Text = Student.Main.GetTextMainFormat(HistorySet, Message_TextStart.GetText(inBot), inBot), ButtonsMessage = MessageButtons });
+        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(new ObjectDataMessageSend(inBot) { Text = Student.Main.GetTextMainFormat(registerInfo.textsHistory, Message_TextStart.GetText(inBot), inBot), ButtonsMessage = MessageButtons });
         public static void SetNextPageStudentOrTeacer(ObjectDataMessageInBot inBot, uint countClearPage, object dopData)
         {
+            RegisterInfo registerInfo = RegisterInfo.Load(dopData);
+            UserRegister.SetRegisterInfo(registerInfo, inBot);
+            UserRegister.AddFlag(UserRegister.RegisterState.GroupOrTeacherSet, inBot);
             UserRegister.RegisterState info = UserRegister.GetInfoRegisterUser(inBot);
             if (info.HasFlag(UserRegister.RegisterState.LoginPasswordSet))
             {
                 ManagerPage.ClearHistoryListPage(inBot, countClearPage + 1);
-                ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NamePage, dopData);
+                ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, NamePage, registerInfo);
             }
             else if (info.HasFlag(UserRegister.RegisterState.NewUser))
             {

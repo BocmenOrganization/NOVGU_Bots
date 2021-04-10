@@ -5,8 +5,8 @@ using System;
 using BotsCore.Moduls.Translate;
 using NOVGUBots.Moduls.NOVGU_SiteData;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using BotsCore;
+using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.BindingNOVGU;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Student
 {
@@ -16,14 +16,11 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 35);
 
         private KitButton MessageButtons;
-        public Text[] HistorySet;
+        public RegisterInfo registerInfo;
 
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
         {
-            if (dataOpenPage is Text[] texts)
-                HistorySet = texts;
-            else if (dataOpenPage is JArray valuePairs)
-                HistorySet = valuePairs.ToObject<Text[]>();
+            registerInfo = RegisterInfo.Load(dataOpenPage);
             Start(inBot);
             ResetLastMessenge(inBot);
         }
@@ -41,10 +38,10 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         }
         private void CommandInvoke(ObjectDataMessageInBot inBot, string text, object data)
         {
-            UserRegister.SetUser(GetUsers(inBot).FirstOrDefault(x => x.Name == text)?.IdString, inBot);
-            Array.Resize(ref HistorySet, HistorySet.Length + 1);
-            HistorySet[HistorySet.Length - 1] = new Text(inBot, text);
-            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, ConfirmationUser.NamePage, HistorySet);
+            registerInfo.UserId = GetUsers(inBot).FirstOrDefault(x => x.Name == text)?.IdString;
+            Array.Resize(ref registerInfo.textsHistory, registerInfo.textsHistory.Length + 1);
+            registerInfo.textsHistory[registerInfo.textsHistory.Length - 1] = new Text(inBot, text);
+            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, ConfirmationUser.NamePage, registerInfo);
         }
         public override void EventInMessage(ObjectDataMessageInBot inBot)
         {
@@ -52,6 +49,6 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
                 ResetLastMessenge(inBot);
         }
 
-        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(new ObjectDataMessageSend(inBot) { Text = Main.GetTextMainFormat(HistorySet, Message_TextStart.GetText(inBot), inBot), ButtonsMessage = MessageButtons });
+        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(new ObjectDataMessageSend(inBot) { Text = Main.GetTextMainFormat(registerInfo.textsHistory, Message_TextStart.GetText(inBot), inBot), ButtonsMessage = MessageButtons });
     }
 }

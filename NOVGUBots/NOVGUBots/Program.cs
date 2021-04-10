@@ -30,6 +30,11 @@ using System.Net.Mail;
 using NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification;
 using System.Linq;
 using System.Net;
+using System.Text;
+using System.Net.Http;
+using System.IO;
+using System;
+using Newtonsoft.Json.Linq;
 
 namespace NOVGUBots
 {
@@ -49,7 +54,6 @@ namespace NOVGUBots
         /// </summary>
         public static void Main()
         {
-            // Получение главного файла настроек
             ObjectSettingCostum settingData = new(SettingPath);
             // Вычлинение некоторых настроек в поля
             NOVGUSetting.Start(settingData);

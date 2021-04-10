@@ -11,7 +11,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 {
     public class SchedulePage
     {
-        public delegate void Update(List<object> updateInfo);
+        public delegate void Update(List<object> updateInfo, object oldData, object newData);
 
         [JsonProperty]
         public TypePars TypeInstitute { get; private set; }
@@ -46,22 +46,20 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
                     foreach (var lang in langs)
                         Name.GetText(lang);
                 }
-                
-
-                lock (Institute)
-                {
-                    Institute = instituteColleges;
-                }
                 if (EventUpdateInstitute != null && listUpdate != null)
                 {
                     try
                     {
-                        EventUpdateInstitute.Invoke(listUpdate);
+                        EventUpdateInstitute.Invoke(listUpdate, Institute, instituteColleges);
                     }
                     catch (Exception e)
                     {
                         EchoLog.Print($"Произошла ошибка при обработки события обновления {Name}: {e.Message}");
                     }
+                }
+                lock (Institute)
+                {
+                    Institute = instituteColleges;
                 }
             }
         }

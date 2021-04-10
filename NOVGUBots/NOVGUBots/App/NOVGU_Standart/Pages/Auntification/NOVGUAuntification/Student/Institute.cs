@@ -7,6 +7,7 @@ using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 using System.Linq;
 using BotsCore.Moduls.Translate;
 using BotsCore;
+using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.BindingNOVGU;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Student
 {
@@ -17,20 +18,19 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         private static readonly ModelMarkerTextData Message_TextStartMainICollege = Message_TextStartMainInstitute.GetElemNewId(32);
 
         private KitButton MessageButtons;
-        public TypePars type;
-        public Text[] HistorySet;
+        public RegisterInfo registerInfo;
 
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
         {
-            type = UserRegister.GetTypeSchedule(inBot);
-            HistorySet = new Text[] { DataNOVGU.GetInfoScheduleInstitute(type).Name };
+            registerInfo = RegisterInfo.Load(dataOpenPage);
+            registerInfo.textsHistory = new Text[] { DataNOVGU.GetInfoScheduleInstitute(registerInfo.type).Name };
             Start(inBot);
             ResetLastMessenge(inBot);
         }
         public override void EventStoreLoad(ObjectDataMessageInBot inBot, bool state) => Start(inBot);
         private void Start(ObjectDataMessageInBot inBot)
         {
-            MessageButtons = KitButton.GenerateKitButtonsTexts(DataNOVGU.GetInfoScheduleInstitute(type).Institute?.Select(x => new Text[] { x.Name }).ToArray(), CommandInvoke, 1d);
+            MessageButtons = KitButton.GenerateKitButtonsTexts(DataNOVGU.GetInfoScheduleInstitute(registerInfo.type).Institute?.Select(x => new Text[] { x.Name }).ToArray(), CommandInvoke, 1d);
         }
         public override void EventInMessage(ObjectDataMessageInBot inBot)
         {
@@ -39,12 +39,12 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         }
         private void CommandInvoke(ObjectDataMessageInBot inBot, Text text, object data)
         {
-            UserRegister.SetNameInstituteCollege(text.GetDefaultText(), inBot);
-            Array.Resize(ref HistorySet, HistorySet.Length + 1);
-            HistorySet[HistorySet.Length - 1] = text;
-            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Course.NamePage, HistorySet);
+            registerInfo.NameInstituteColleg = text.GetDefaultText();
+            Array.Resize(ref registerInfo.textsHistory, registerInfo.textsHistory.Length + 1);
+            registerInfo.textsHistory[registerInfo.textsHistory.Length - 1] = text;
+            ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Course.NamePage, registerInfo);
         }
 
-        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(new ObjectDataMessageSend(inBot) { Text = Main.GetTextMainFormat(HistorySet, (type == TypePars.College ? Message_TextStartMainICollege.GetText(inBot) : Message_TextStartMainInstitute.GetText(inBot)), inBot), ButtonsMessage = MessageButtons });
+        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(new ObjectDataMessageSend(inBot) { Text = Main.GetTextMainFormat(registerInfo.textsHistory, (registerInfo.type == TypePars.College ? Message_TextStartMainICollege.GetText(inBot) : Message_TextStartMainInstitute.GetText(inBot)), inBot), ButtonsMessage = MessageButtons });
     }
 }

@@ -6,6 +6,7 @@ using BotsCore.Moduls.Translate;
 using NOVGUBots.Moduls.NOVGU_SiteData;
 using System.Linq;
 using BotsCore;
+using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.BindingNOVGU;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Teacher
 {
@@ -17,8 +18,12 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Te
 
         public char[] NameUser;
         private KitButton searchUsersButton;
-
-        public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage) => ResetLastMessenge(inBot);
+        public RegisterInfo registerInfo;
+        public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
+        {
+            registerInfo = RegisterInfo.Load(dataOpenPage);
+            ResetLastMessenge(inBot);
+        }
         public override void EventStoreLoad(ObjectDataMessageInBot inBot, bool state)
         {
             SearchUserDataChar(NameUser);
@@ -55,9 +60,9 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Te
         private static string[] GetWords(string text) => text.ToLower().Split(' ')?.Where(x => !string.IsNullOrWhiteSpace(x))?.ToArray();
         private void CommandInvoke(ObjectDataMessageInBot inBot, string text, object data)
         {
-            UserRegister.SetUser(DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.Name == text).User.IdString, inBot);
-            UserRegister.AddFlag(UserRegister.RegisterState.GroupOrTeacherSet, inBot);
-            IsConfirmationUser.SetNextPageStudentOrTeacer(inBot, 0, new Text[] { new Text(inBot, text) });
+            registerInfo.UserId = DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.Name == text).User.IdString;
+            registerInfo.textsHistory = new Text[] { new Text(inBot, text) };
+            IsConfirmationUser.SetNextPageStudentOrTeacer(inBot, 1, registerInfo);
         }
 
         public override void ResetLastMessenge(ObjectDataMessageInBot inBot)

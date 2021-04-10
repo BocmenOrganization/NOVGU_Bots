@@ -177,7 +177,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
                     return href == this;
                 return false;
             }
-            public override int GetHashCode() => Url.GetHashCode();
+            public override int GetHashCode() => Url?.GetHashCode() ?? 0;
         }
         public class DayStudents : IUpdated
         {

@@ -34,7 +34,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
             new SchedulePage(new(Lang.LangTypes.ru, "Колледжи"), "https://www.novsu.ru/univer/timetable/spo/", TypePars.College),
             new SchedulePage(new(Lang.LangTypes.ru, "Сессия"), "https://www.novsu.ru/univer/timetable/session/", TypePars.Session)
         };
-        public static UserTeacher[] UserTeachers { get; private set; }
+        private static System.Timers.Timer timerUpdate;
+        public static UserTeacher[] UserTeachers { get; private set; } = Array.Empty<UserTeacher>();
         public static Update EventUpdateUserTeachers { get; set; }
         public static DateTime[][][] Calendar { get; private set; }
 
@@ -92,7 +93,18 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
             else
                 LoadNewData(ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute, NOVGUSetting.langs);
         }
-        public static void Start() { }
+        public static void Start(uint periodUpdate) 
+        {
+            timerUpdate?.Stop();
+            timerUpdate = new System.Timers.Timer(periodUpdate);
+            timerUpdate.Elapsed += (sender, e) => 
+            { 
+                LoadNewData(DefaultParalelSetting, NOVGUSetting.langs);
+                timerUpdate?.Start();
+            };
+            timerUpdate.AutoReset = false;
+            timerUpdate.Start();
+        }
         public static void LoadNewData(ParalelSetting? paralelSetting, params Lang.LangTypes[] langs)
         {
             paralelSetting ??= DefaultParalelSetting;
@@ -110,17 +122,20 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
             {
                 UserTeacher[] newdataTeacher = UpdateInfoUserTeachers.newData.Select(x => (UserTeacher)x).ToArray();
                 newdataTeacher.AsParallel().ForAll(x => ((ITranslatable)x).Translate(langs));
-                UserTeachers = newdataTeacher;
                 if (EventUpdateUserTeachers != null)
                 {
                     try
                     {
-                        EventUpdateUserTeachers.Invoke(infoUpdate);
+                        EventUpdateUserTeachers.Invoke(infoUpdate, UserTeachers, newdataTeacher);
                     }
                     catch (Exception e)
                     {
                         EchoLog.Print($"Произошла ошибка при обработки события обновления данных учителей: {e.Message}");
                     }
+                }
+                lock (UserTeachers)
+                {
+                    UserTeachers = newdataTeacher;
                 }
             }
 

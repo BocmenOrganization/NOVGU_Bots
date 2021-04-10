@@ -4,6 +4,7 @@ using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
 using System.Collections.Generic;
 using BotsCore.Moduls.Translate;
 using System.Linq;
+using System;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
 {

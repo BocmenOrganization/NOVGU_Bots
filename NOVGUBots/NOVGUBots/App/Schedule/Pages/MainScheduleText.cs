@@ -2,12 +2,10 @@
 using BotsCore.Moduls.Tables.Services;
 using BotsCore.Bots.Model.Buttons;
 using System;
-using BotsCore.Moduls.Translate;
-using NOVGUBots.Moduls.NOVGU_SiteData;
 using System.Linq;
 using BotsCore;
-using static BotsCore.Bots.Model.ObjectDataMessageSend;
 using System.Collections.Generic;
+using System.IO;
 
 namespace NOVGUBots.App.Schedule.Pages
 {

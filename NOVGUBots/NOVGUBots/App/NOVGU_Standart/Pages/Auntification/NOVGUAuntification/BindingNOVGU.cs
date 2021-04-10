@@ -6,7 +6,9 @@ using static BotsCore.Bots.Model.ObjectDataMessageSend;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
-
+using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
+using BotsCore.Moduls.Translate;
+using Newtonsoft.Json.Linq;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 {
@@ -22,11 +24,11 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
             {
                 new Button[]
                 {
-                    new Button(Buttons_IdTextStudent, (inBot, s, data) => { UserRegister.SetUserState(UserRegister.UserState.Student, inBot); ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Student.Main.NamePage); return true; })
+                    new Button(Buttons_IdTextStudent, (inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Student.Main.NamePage, new RegisterInfo() { userState = UserRegister.UserState.Student }); return true; })
                 },
                 new Button[]
                 {
-                    new Button(Buttons_IdTextTeacher, (inBot, s, data) => { UserRegister.SetUserState(UserRegister.UserState.Teacher, inBot); ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Teacher.Search.NamePage); return true; })
+                    new Button(Buttons_IdTextTeacher, (inBot, s, data) => { ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Teacher.Search.NamePage, new RegisterInfo() { userState = UserRegister.UserState.Teacher }); return true; })
                 }
             });
 
@@ -40,6 +42,25 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
         private void SendMessage(ObjectDataMessageInBot inBot)
         {
             SendDataBot(new ObjectDataMessageSend(inBot) { Text = string.Format(Message_TextStartMain.GetText(inBot), Buttons_IdTextStudent.GetText(inBot), Buttons_IdTextTeacher.GetText(inBot)), ButtonsMessage = Buttons_Message });
+        }
+
+        public struct RegisterInfo
+        {
+            public Text[] textsHistory;
+            public UserRegister.UserState userState;
+            public TypePars type;
+            public string NameInstituteColleg;
+            public string NameCourse;
+            public string NameGroup;
+            public string UserId;
+            public static RegisterInfo Load(object e)
+            {
+                if (e is RegisterInfo registerInfo)
+                    return registerInfo;
+                else if (e is JObject valuePairs)
+                    return valuePairs.ToObject<RegisterInfo>();
+                return new RegisterInfo();
+            }
         }
     }
 }
