@@ -24,12 +24,6 @@ namespace NOVGUBots.App.Schedule.Pages
 
         public override void EventInMessage(ObjectDataMessageInBot inBot) => ResetLastMessenge(inBot);
 
-        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(StaticData.GetSendMessage(inBot, GenereteUrlTelegram, dates));
-        private static string GenereteUrlTelegram(Href href, Lang.LangTypes lang)
-        {
-            if (href != null && href.Text != null && !string.IsNullOrWhiteSpace(href.Url))
-                return $"[{href.Text.GetText(lang)}]({href.Url})";
-            return null;
-        }
+        public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(StaticData.GetSendMessage(inBot, dates));
     }
 }

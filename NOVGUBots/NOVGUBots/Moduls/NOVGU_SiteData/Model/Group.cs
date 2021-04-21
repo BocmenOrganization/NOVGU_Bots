@@ -100,7 +100,13 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         }
         public override string ToString() => $"{Name} {Direction}";
 
-        public IEnumerable<object> GetData() => throw new System.NotImplementedException();
+        public IEnumerable<object> GetData()
+        {
+            List<object> resul = new() { tableSchedule };
+            if (users != null)
+                resul.AddRange(users);
+            return resul;
+        }
         public void SetData(IEnumerable<object> newData) => throw new System.NotImplementedException();
         public List<Text> GetTextsTranslate()
         {
@@ -123,7 +129,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             var updatedUserInfo = IUpdated.Update(users, users, ref updatedInfo);
             if (updatedUserInfo.stateUpdated)
                 users = updatedUserInfo.newData?.Select(x => (User)x).ToArray();
-            (bool ifoUpdateTableSchedule, _) = IUpdated.Update(tableSchedule.GetData(), tableSchedule.GetData(), ref updatedInfo);
+            (bool ifoUpdateTableSchedule, _) = IUpdated.Update(tableSchedule.GetData(), this.tableSchedule.GetData(), ref updatedInfo);
+            //TOODO запись
             return updatedUserInfo.stateUpdated || ifoUpdateTableSchedule;
         }
     }

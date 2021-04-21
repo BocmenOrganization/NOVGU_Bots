@@ -140,6 +140,11 @@ namespace NOVGUBots.App.Schedule.Pages
             }
         }
 
+        public static ObjectDataMessageSend GetSendMessage(ObjectDataMessageInBot inBot, params DateTime[] dates)
+        {
+            Func<Href, Lang.LangTypes, string> generateUrlText = inBot.BotID.bot == BotsCore.Bots.Interface.IBot.BotTypes.Telegram ? GenereteUrlTelegram : null;
+            return GetSendMessage(inBot, generateUrlText, dates);
+        }
         public static ObjectDataMessageSend GetSendMessage(ObjectDataMessageInBot inBot, Func<Href, Lang.LangTypes, string> generateUrlText, params DateTime[] dates)
         {
             Media[] medias = null;
@@ -224,7 +229,7 @@ namespace NOVGUBots.App.Schedule.Pages
         private static string[] GetLinesSchedule(ObjectDataMessageInBot inBot, LineTeacher lineTeacher, Func<Href, Lang.LangTypes, string> generateUrlText, string EmojiWho)
         {
             List<string> linesRes = new List<string>();
-            linesRes.Add($"{Emoji_time}{lineTeacher.TimeStartEnd.First().ToShortTimeString()}-{lineTeacher.TimeStartEnd.Last().ToShortTimeString()}");
+            linesRes.Add($"{Emoji_time}{lineTeacher.TimeStartEnd.First().ToString(@"hh\:mm")}-{lineTeacher.TimeStartEnd.Last().ToString(@"hh\:mm")}");
             linesRes.AddRange(lineTeacher.Who?.Where(x => x != null).Select(x => $"{EmojiWho} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
             linesRes.AddRange(lineTeacher.Auditorium?.Where(x => x != null).Select(x => $"{Emoji_auditorium} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
             linesRes.AddRange(lineTeacher.Comment?.Where(x => x != null).Select(x => $"{Emoji_comments} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
@@ -261,6 +266,12 @@ namespace NOVGUBots.App.Schedule.Pages
                 };
             }
             return stringBuilder.ToString();
+        }
+        private static string GenereteUrlTelegram(Href href, Lang.LangTypes lang)
+        {
+            if (href != null && href.Text != null && !string.IsNullOrWhiteSpace(href.Url))
+                return $"[{href.Text.GetText(lang)}]({href.Url})";
+            return null;
         }
     }
 }

@@ -32,8 +32,11 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         {
             this.Name = Name;
             Id = uint.Parse(Path.GetFileName(url));
-            IdString = GetId(GetUrlUserPage(Id));
-            Email = IdString != null ? GetEmail(UrlPage) : null;
+            try
+            {
+                IdString = GetId(GetUrlUserPage(Id));
+                Email = IdString != null ? GetEmail(UrlPage) : null;
+            }catch { }
         }
         [JsonConstructor]
         private User() { }
@@ -59,12 +62,11 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             if (cookiesPars == null)
             {
                 var cookiesContener = new CookieContainer();
-                cookiesContener.Add(GetResponse(url).Cookies);
+                cookiesContener.Add(GetResponse(url)?.Cookies);
                 if (cookiesPars == null)
                     cookiesPars = cookiesContener;
             }
-            var r = GetResponse(url);
-            using Stream stream = r.GetResponseStream();
+            using Stream stream = GetResponse(url)?.GetResponseStream();
             using StreamReader streamReader = new(stream);
             HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(streamReader.ReadToEnd());
@@ -78,12 +80,24 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         }
         private static HttpWebResponse GetResponse(string url)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.CookieContainer = cookiesPars == default ? new CookieContainer() : cookiesPars;
-            request.Method = "GET";
-            request.Timeout = 600000;
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            return response;
+            byte ErrorCount = 0;
+        rest:
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.CookieContainer = cookiesPars == default ? new CookieContainer() : cookiesPars;
+                request.Method = "GET";
+                request.Timeout = 600000;
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                return response;
+            }
+            catch
+            {
+                if (ErrorCount == 4)
+                    return null;
+                ErrorCount++;
+                goto rest;
+            }
         }
         private static string GetUrlUserPage(uint id)
         {

@@ -93,13 +93,20 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
             else
                 LoadNewData(ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute, NOVGUSetting.langs);
         }
-        public static void Start(uint periodUpdate) 
+        public static void Start(uint periodUpdate = 1000)
         {
             timerUpdate?.Stop();
             timerUpdate = new System.Timers.Timer(periodUpdate);
-            timerUpdate.Elapsed += (sender, e) => 
-            { 
-                LoadNewData(DefaultParalelSetting, NOVGUSetting.langs);
+            timerUpdate.Elapsed += (sender, e) =>
+            {
+                try
+                {
+                    LoadNewData(DefaultParalelSetting, NOVGUSetting.langs);
+                }
+                catch (Exception ex)
+                {
+                    EchoLog.Print($"При обновлении расписания произошла ошибка: {ex.Message}");
+                }
                 timerUpdate?.Start();
             };
             timerUpdate.AutoReset = false;
@@ -117,6 +124,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
 
             List<object> infoUpdate = new List<object>();
             var NewDataUserTeachers = GetTeachers(new WebClient().DownloadString(UrlTeachers), (ParalelSetting)paralelSetting);
+            var OldDataTescher = JsonConvert.DeserializeObject<UserTeacher[]>(JsonConvert.SerializeObject(UserTeachers));
             var UpdateInfoUserTeachers = IUpdated.Update(NewDataUserTeachers, UserTeachers, ref infoUpdate);
             if (UpdateInfoUserTeachers.stateUpdated)
             {
@@ -126,16 +134,17 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
                 {
                     try
                     {
-                        EventUpdateUserTeachers.Invoke(infoUpdate, UserTeachers, newdataTeacher);
+                        EventUpdateUserTeachers.Invoke(infoUpdate, OldDataTescher, newdataTeacher);
+                        EchoLog.Print("Обновилось расписание преподователей");
                     }
                     catch (Exception e)
                     {
                         EchoLog.Print($"Произошла ошибка при обработки события обновления данных учителей: {e.Message}");
                     }
-                }
-                lock (UserTeachers)
-                {
-                    UserTeachers = newdataTeacher;
+                    lock (UserTeachers)
+                    {
+                        UserTeachers = NewDataUserTeachers;
+                    }
                 }
             }
 

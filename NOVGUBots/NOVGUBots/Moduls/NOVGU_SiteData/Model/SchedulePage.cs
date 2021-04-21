@@ -28,6 +28,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         public void UpdateData(InstituteCollege[] newData, Lang.LangTypes[] langs)
         {
             List<object> listUpdate = null;
+            var OldData = JsonConvert.DeserializeObject<InstituteCollege[]>(JsonConvert.SerializeObject(Institute));
             if (Institute.Length > 0)
             {
                 bool isUpdate = false;
@@ -50,7 +51,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
                 {
                     try
                     {
-                        EventUpdateInstitute.Invoke(listUpdate, Institute, instituteColleges);
+                        EventUpdateInstitute.Invoke(listUpdate, OldData, instituteColleges);
+                        EchoLog.Print($"Обновилось расписание: {Name.GetDefaultText()}");
                     }
                     catch (Exception e)
                     {

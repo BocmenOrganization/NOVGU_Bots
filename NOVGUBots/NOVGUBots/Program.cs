@@ -26,15 +26,10 @@ using NOVGUBots.SettingCore;
 using static BotsCore.Bots.Model.ObjectDataMessageSend;
 using NOVGUBots.App.NOVGU_Standart;
 using NOVGUBots.Moduls.NOVGU_SiteData;
-using System.Net.Mail;
 using NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Net.Http;
-using System.IO;
-using System;
-using Newtonsoft.Json.Linq;
+using NOVGUBots.App.Schedule.Pages;
+using BotsCore.Moduls;
 
 namespace NOVGUBots
 {
@@ -49,28 +44,42 @@ namespace NOVGUBots
             new CreatePageAppStandart(),
             new App.Schedule.CretePageSchedule()
         };
-        /// <summary>
-        /// 
-        /// </summary>
         public static void Main()
         {
+            EchoLog.Print("\r\n          ██████╗░░█████╗░░█████╗░███╗░░░███╗███████╗███╗░░██╗  ░█████╗░░█████╗░██████╗░██████╗░\r\n          ██╔══██╗██╔══██╗██╔══██╗████╗░████║██╔════╝████╗░██║  ██╔══██╗██╔══██╗██╔══██╗██╔══██╗\r\n          ██████╦╝██║░░██║██║░░╚═╝██╔████╔██║█████╗░░██╔██╗██║  ██║░░╚═╝██║░░██║██████╔╝██████╔╝\r\n          ██╔══██╗██║░░██║██║░░██╗██║╚██╔╝██║██╔══╝░░██║╚████║  ██║░░██╗██║░░██║██╔══██╗██╔═══╝░\r\n          ██╔══██╗██║░░██║██║░░██╗██║╚██╔╝██║██╔══╝░░██║╚████║  ██║░░██╗██║░░██║██╔══██╗██╔═══╝░\r\n          ██████╦╝╚█████╔╝╚█████╔╝██║░╚═╝░██║███████╗██║░╚███║  ╚█████╔╝╚█████╔╝██║░░██║██║░░░░░\r\n          ╚═════╝░░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚══════╝╚═╝░░╚══╝  ░╚════╝░░╚════╝░╚═╝░░╚═╝╚═╝░░░░░\r\n\r\n");
             ObjectSettingCostum settingData = new(SettingPath);
+            EchoLog.Print("Настройки были полученны");
             // Вычлинение некоторых настроек в поля
             NOVGUSetting.Start(settingData);
-            // Запуск парсера
-            DataNOVGU.Start();
+            EchoLog.Print("Настройки были применены");
             // Инцилизация базы пользователей
             ManagerUser.Start(new ObjectSettingCostum(NOVGUSetting.objectSetting.GetValue("ManagerUser_PathFileSetting")));
+            EchoLog.Print("Данные пользователей были подгруженны");
+            // Запуск парсера
+            EchoLog.Print("Запускаю парсер");
+            StatickCheckUpdate.Start();
+            EchoLog.Print("Парсер был запущен");
+            EchoLog.Print("Были подключены события обновления расписания");
             // Загрузка базовых таблиц
+            EchoLog.Print("Получаю данные таблиц");
             LoadStandartTables();
-            // Загруза почтового сервиса подтверждения авторизации
-            LoadMaling();
-            // Подгрузка всех приложений
-            LoadApp();
-            // Инцилизация ботов
-            LoadBots();
+            EchoLog.Print("Данные таблиц были полученны");
             // Применение настроек для менеджера страниц
             ManagerPage.Start(new SettingManagerPage());
+            EchoLog.Print("Данные менеджера страниц были установленны");
+            // Загруза почтового сервиса подтверждения авторизации
+            LoadMaling();
+            EchoLog.Print("Почтовый сервис был запущен");
+            // Подгрузка всех приложений
+            EchoLog.Print("Подгружаю подключенные страницы");
+            LoadApp();
+            EchoLog.Print("Страницы были загруженны");
+            // Инцилизация ботов
+            EchoLog.Print("Запускаю клиенты ботов");
+            LoadBots();
+            EchoLog.Print("Боты были запущенны");
+            // Старт постоянного поиска обновлений в расписании
+            DataNOVGU.Start();
             // Вечное ожидание чтоб программа не закрылась
             System.Diagnostics.Process.GetCurrentProcess().WaitForExit();
         }

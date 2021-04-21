@@ -5,6 +5,7 @@ using System.Linq;
 using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 using Newtonsoft.Json;
+using System;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 {

@@ -56,7 +56,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
                 if (typePars != TypePars.Teacher)
                     numGroup[countLine - 1] = ClearText(nodes[1 - offset - offsetType].InnerText);
                 subject[countLine - 1] = new Text(Lang.LangTypes.ru, ClearText(nodes[2 - offset - offsetType].InnerText));
-                who[countLine - 1] = GetHref(ref document, nodes[3 - offset - offsetType], typePars == TypePars.Teacher, $"{Host}/univer/timetable/ochn/i.1103357/");
+                who[countLine - 1] = GetHref(ref document, nodes[3 - offset - offsetType], true, $"{Host}/univer/timetable/ochn/i.1103357/");
                 if (!(typePars == TypePars.Teacher) && who[countLine - 1] != null)
                     who[countLine - 1] = new Href() { Text = who[countLine - 1].Text, Url = GetUrlTeacher(who[countLine - 1].Url) };
                 auditorium[countLine - 1] = GetHref(ref document, nodes[4 - offset - offsetType], true, $"{Host}/univer/timetable/ochn/i.1103357/");
@@ -267,7 +267,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
         public class LineTeacher : IGetId
         {
             [JsonProperty]
-            public DateTime[] TimeStartEnd { get; protected set; }
+            public TimeSpan[] TimeStartEnd { get; protected set; }
             [JsonProperty]
             public Text[] Subject { get; protected set; }
             [JsonProperty]
@@ -279,7 +279,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
 
             public LineTeacher(DateTime[] TimeStartEnd, Text[] Subject, Href[] Auditorium, Href[] Who, Href[] Comment)
             {
-                this.TimeStartEnd = TimeStartEnd;
+                this.TimeStartEnd = TimeStartEnd.Select(x => x.TimeOfDay).ToArray();
                 this.Subject = Subject.Distinct().ToArray();
                 this.Auditorium = Auditorium.Distinct().ToArray();
                 this.Who = Who.Distinct().ToArray();
