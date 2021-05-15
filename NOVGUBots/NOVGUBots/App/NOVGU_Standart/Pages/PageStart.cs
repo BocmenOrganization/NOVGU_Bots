@@ -1,15 +1,15 @@
-﻿using BotsCore.Bots.Model;
-using BotsCore.Moduls.Tables.Services;
+﻿using BotsCore.Moduls.Tables.Services;
 using BotsCore.Bots.Model.Buttons;
 using BotsCore;
 using static BotsCore.Bots.Model.ObjectDataMessageSend;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using BotsCore.Bots.Model;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages
 {
-    public class PageStart : Page
+    public class PageStart : ManagerPageNOVGU.Page
     {
         private static readonly ModelMarkerUneversalData<Media[]> Message_MedaiMessage = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableMedia, 0);
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 1);
@@ -40,7 +40,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
         private DateTime timeStartSendMessage;
         public bool IsSendStartMessage;
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage) => StartMessage(inBot);
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!ButtonMessage_Further.CommandInvoke(inBot))
                 StartMessage(inBot);

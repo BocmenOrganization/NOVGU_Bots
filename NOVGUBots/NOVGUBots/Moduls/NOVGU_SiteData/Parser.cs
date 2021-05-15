@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System;
+using System.Net;
+using System.Net.Http;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData
 {
@@ -77,6 +79,26 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
             return htmlNodes?.Where((x, i) => i % 2 != 0).Select(x => x.InnerText.Split("-")?.Select(x => DateTime.Parse(x)).ToArray()).GroupBy(x => ++@switch % 2 == 0).Select(x => x?.ToArray()).ToArray();
         }
         public static string ClearText(string text) => string.Join(" ", Regex.Replace(text, @"[\r\n\t]", "")?.Split(' ')?.Where(x => !string.IsNullOrWhiteSpace(x)));
+        public static string LoadHtml(string Url)
+        {
+            byte countRestart = 0;
+        rest:
+            try
+            {
+                HttpClient client = new();
+                using HttpResponseMessage response = client.GetAsync(Url).Result;
+                using HttpContent content = response.Content;
+                return content.ReadAsStringAsync().Result;
+            }
+            catch
+            {
+                countRestart++;
+                if (countRestart <= 3)
+                    goto rest;
+                else
+                    throw new Exception($"Ну удалось получить Html страницы, по адресу: {Url}");
+            }
+        }
         [Flags]
         public enum ParalelSetting : uint
         {

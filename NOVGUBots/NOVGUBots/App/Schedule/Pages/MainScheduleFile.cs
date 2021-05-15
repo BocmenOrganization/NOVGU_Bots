@@ -13,7 +13,7 @@ using static BotsCore.Bots.Model.ObjectDataMessageSend;
 
 namespace NOVGUBots.App.Schedule.Pages
 {
-    public class MainScheduleFile : Page
+    public class MainScheduleFile : ManagerPageNOVGU.Page
     {
         private static readonly ModelMarkerTextData DownloadText = StaticData.Text_NoDataSchedule.GetElemNewId(13);
         private static readonly ModelMarkerTextData SatusDownloadFileInfo = DownloadText.GetElemNewId(14);
@@ -29,7 +29,7 @@ namespace NOVGUBots.App.Schedule.Pages
         private Media[] medias;
 
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage) => ResetLastMessenge(inBot);
-        public override void EventInMessage(ObjectDataMessageInBot inBot) => ResetLastMessenge(inBot);
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot) => ResetLastMessenge(inBot);
         public override void ResetLastMessenge(ObjectDataMessageInBot inBot)
         {
             if (!LoadetPhoto)

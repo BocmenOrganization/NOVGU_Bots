@@ -125,18 +125,18 @@ namespace NOVGUBots.App.Schedule.Pages
                     ?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)
                     ?.Courses
                     ?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)
-                    ?.groups
+                    ?.Groups
                     ?.FirstOrDefault(x => x.Name == NameGroup)
                     .tableSchedule
                     ?.DataTable;
-                return dates.Where(x => ScheduleO.Where(o => o.Date.Where(d => d.Date == x).Count() > 0).Count() > 0).ToArray();
+                return dates.Where(x => ScheduleO.Where(o => o.Date.Where(d => d.Date == x).Any()).Any()).ToArray();
             }
             else
             {
                 string NameIdUser = UserRegister.GetUser(inBot);
                 var ScheduleO = DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.IdString == NameIdUser)
                     ?.Schedule;
-                return dates.Where(x => ScheduleO.Where(o => o.Date.Where(d => d.Date == x).Count() > 0).Count() > 0).ToArray();
+                return dates.Where(x => ScheduleO.Where(o => o.Date.Where(d => d.Date == x).Any()).Any()).ToArray();
             }
         }
 
@@ -148,7 +148,7 @@ namespace NOVGUBots.App.Schedule.Pages
         public static ObjectDataMessageSend GetSendMessage(ObjectDataMessageInBot inBot, Func<Href, Lang.LangTypes, string> generateUrlText, params DateTime[] dates)
         {
             Media[] medias = null;
-            if (dates.Length == 1)
+            if (dates?.Length == 1)
                 medias = MessageMedia_DayOfWeek[(int)dates.First().DayOfWeek - 1][GetInfo_UpDownWeek() ? 0 : 1];
             return new ObjectDataMessageSend(inBot) { Text = GetScheduleText(inBot, generateUrlText, dates), media = medias };
         }
@@ -160,7 +160,7 @@ namespace NOVGUBots.App.Schedule.Pages
         public static string GetScheduleText(ObjectDataMessageInBot inBot, Func<Href, Lang.LangTypes, string> GenerateUrlText, params DateTime[] dates)
         {
             if (dates == null || dates.Length == 0) return null;
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new();
             (DateTime[], string)[] daysSchedule = null;
             if (UserRegister.GetUserState(inBot) == UserRegister.UserState.Student)
                 daysSchedule = GetScheduleTextStudent(inBot, GenerateUrlText, dates);
@@ -198,11 +198,11 @@ namespace NOVGUBots.App.Schedule.Pages
                 ?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)
                 ?.Courses
                 ?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)
-                ?.groups
+                ?.Groups
                 ?.FirstOrDefault(x => x.Name == NameGroup)
                 .tableSchedule
                 ?.DataTable
-                ?.Where(x => (x.Date?.Where(x => dates.Where(d => d.Date == x.Date).Count() > 0)?.Count() ?? 0) > 0)?.ToArray();
+                ?.Where(x => (x.Date?.Where(x => dates.Where(d => d.Date == x.Date).Any())?.Count() ?? 0) > 0)?.ToArray();
 
             if (ScheduleO != null)
                 return ScheduleO?.Select(s => (s.Date, string.Join("\n\n", s.Lines?.Select((x, i) => $"{GetNumber((uint)(i + 1))}{x.Subject?.First().GetText(inBot)}\n{BuildLines(GetLinesSchedule(inBot, x, generateUrlText, Emoji_teacher))}")))).ToArray();
@@ -218,7 +218,7 @@ namespace NOVGUBots.App.Schedule.Pages
             string NameIdUser = UserRegister.GetUser(inBot);
             var ScheduleO = DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.IdString == NameIdUser)
                 ?.Schedule
-                ?.Where(x => x.Date?.Where(x => dates.Where(d => d.Date == x.Date).Count() > 0).Count() > 0)?.ToArray();
+                ?.Where(x => x.Date?.Where(x => dates.Where(d => d.Date == x.Date).Any()).Count() > 0)?.ToArray();
             if (ScheduleO != null)
                 return ScheduleO?.Select(s => (s.Date, string.Join("\n\n", s.Lines?.Select((x, i) => $"{GetNumber((uint)(i + 1))}{x.Subject?.First().GetText(inBot)}\n{BuildLines(GetLinesSchedule(inBot, x, generateUrlText, Emoji_students))}")))).ToArray();
             return null;
@@ -228,12 +228,17 @@ namespace NOVGUBots.App.Schedule.Pages
         /// </summary>
         private static string[] GetLinesSchedule(ObjectDataMessageInBot inBot, LineTeacher lineTeacher, Func<Href, Lang.LangTypes, string> generateUrlText, string EmojiWho)
         {
-            List<string> linesRes = new List<string>();
-            linesRes.Add($"{Emoji_time}{lineTeacher.TimeStartEnd.First().ToString(@"hh\:mm")}-{lineTeacher.TimeStartEnd.Last().ToString(@"hh\:mm")}");
-            linesRes.AddRange(lineTeacher.Who?.Where(x => x != null).Select(x => $"{EmojiWho} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
-            linesRes.AddRange(lineTeacher.Auditorium?.Where(x => x != null).Select(x => $"{Emoji_auditorium} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
-            linesRes.AddRange(lineTeacher.Comment?.Where(x => x != null).Select(x => $"{Emoji_comments} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
-            return linesRes.Where(x => x != null).ToArray();
+            if (lineTeacher == null) return null;
+            List<string> linesRes = new();
+            if (lineTeacher.TimeStartEnd != null && lineTeacher.TimeStartEnd.Any())
+                linesRes.Add($"{Emoji_time}{lineTeacher.TimeStartEnd.First():hh\\:mm}-{lineTeacher.TimeStartEnd.Last():hh\\:mm}");
+            if (lineTeacher.Who != null && lineTeacher.Who.Any())
+                linesRes.AddRange(lineTeacher.Who.Where(x => x != null).Select(x => $"{EmojiWho} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
+            if (lineTeacher.Auditorium != null && lineTeacher.Auditorium.Any())
+                linesRes.AddRange(lineTeacher.Auditorium?.Where(x => x != null).Select(x => $"{Emoji_auditorium} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
+            if (lineTeacher.Comment != null && lineTeacher.Comment.Any())
+                linesRes.AddRange(lineTeacher.Comment.Where(x => x != null).Select(x => $"{Emoji_comments} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
+            return linesRes?.Where(x => x != null && lineTeacher.TimeStartEnd.Any())?.ToArray();
         }
         /// <summary>
         /// Генерация вложенного текста

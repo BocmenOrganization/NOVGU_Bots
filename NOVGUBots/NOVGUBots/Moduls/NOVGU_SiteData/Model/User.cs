@@ -36,7 +36,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             {
                 IdString = GetId(GetUrlUserPage(Id));
                 Email = IdString != null ? GetEmail(UrlPage) : null;
-            }catch { }
+            }
+            catch { }
         }
         [JsonConstructor]
         private User() { }

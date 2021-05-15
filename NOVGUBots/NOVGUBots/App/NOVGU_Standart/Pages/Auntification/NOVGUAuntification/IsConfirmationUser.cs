@@ -2,8 +2,6 @@
 using BotsCore.Moduls.Tables.Services;
 using BotsCore.Bots.Model.Buttons;
 using System;
-using BotsCore.Moduls.Translate;
-using Newtonsoft.Json.Linq;
 using BotsCore;
 using System.Linq;
 using BotsCore.User;
@@ -11,7 +9,7 @@ using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 {
-    public class IsConfirmationUser : Page
+    public class IsConfirmationUser : ManagerPageNOVGU.Page
     {
         public const string NamePage = "NovguUser=Регистрация->Подтверждение?";
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 36);
@@ -46,7 +44,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
             registerInfo = RegisterInfo.Load(dataOpenPage);
             ResetLastMessenge(inBot);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!MessageButtons.CommandInvoke(inBot, registerInfo))
                 ResetLastMessenge(inBot);
@@ -55,6 +53,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
         public static void SetNextPageStudentOrTeacer(ObjectDataMessageInBot inBot, uint countClearPage, object dopData)
         {
             RegisterInfo registerInfo = RegisterInfo.Load(dopData);
+
             UserRegister.SetRegisterInfo(registerInfo, inBot);
             UserRegister.AddFlag(UserRegister.RegisterState.GroupOrTeacherSet, inBot);
             UserRegister.RegisterState info = UserRegister.GetInfoRegisterUser(inBot);

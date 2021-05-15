@@ -7,7 +7,7 @@ using System;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification
 {
-    public class Main : Page
+    public class Main : ManagerPageNOVGU.Page
     {
         public const string BotsAuntification_Register = "UserBot=Регистрация->РегистрацияБота";
         public const string BotsAuntification_Entry = "UserBot=Регистрация->ВходАккБота";
@@ -68,7 +68,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification
         {
             SendMessage(inBot);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!ButtonsMessage_Main.CommandInvoke(inBot))
                 SendMessage(inBot);

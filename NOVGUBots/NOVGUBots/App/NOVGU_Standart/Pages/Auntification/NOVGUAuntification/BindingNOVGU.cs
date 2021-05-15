@@ -9,16 +9,17 @@ using System;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 using BotsCore.Moduls.Translate;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 {
-    public class BindingNOVGU : Page
+    public class BindingNOVGU : ManagerPageNOVGU.Page
     {
         public const string NamePage = "NovguUser=Регистрация->Главная";
 
         private static readonly ModelMarkerTextData Message_TextStartMain = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 5);
-        private static readonly ModelMarkerTextData Buttons_IdTextStudent = Message_TextStartMain.GetElemNewId(6);
-        private static readonly ModelMarkerTextData Buttons_IdTextTeacher = Message_TextStartMain.GetElemNewId(7);
+        public static readonly ModelMarkerTextData Buttons_IdTextStudent = Message_TextStartMain.GetElemNewId(6);
+        public static readonly ModelMarkerTextData Buttons_IdTextTeacher = Message_TextStartMain.GetElemNewId(7);
 
         private static readonly KitButton Buttons_Message = new(new Button[][]
             {
@@ -32,7 +33,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 }
             });
 
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!Buttons_Message.CommandInvoke(inBot))
                 SendMessage(inBot);
@@ -46,7 +47,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 
         public struct RegisterInfo
         {
-            public Text[] textsHistory;
+            public List<Text> textsHistory;
             public UserRegister.UserState userState;
             public TypePars type;
             public string NameInstituteColleg;
@@ -55,6 +56,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
             public string UserId;
             public static RegisterInfo Load(object e)
             {
+                if (e == null) return new RegisterInfo();
                 if (e is RegisterInfo registerInfo)
                     return registerInfo;
                 else if (e is JObject valuePairs)

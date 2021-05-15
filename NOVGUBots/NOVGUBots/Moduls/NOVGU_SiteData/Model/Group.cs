@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 using HtmlAgilityPack;
-using System.Net;
 using BotsCore.Moduls.Translate;
 using NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule;
 using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
@@ -21,7 +20,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         [JsonProperty]
         public Text Profile { get; private set; }
         [JsonProperty]
-        public User[] users { get; private set; }
+        public User[] Users { get; private set; }
         [JsonProperty]
         public TableScheduleStudents tableSchedule;
 
@@ -33,9 +32,9 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             YearReceipt = dataParsUser.YearReceipt;
             Profile = dataParsUser.Profile;
             if ((paralelSetting & ParalelSetting.PeopleGroup) > 0)
-                users = dataParsUser.users?.AsParallel()?.Select(x => new User(x.Name, x.Url))?.ToArray();
+                Users = dataParsUser.users?.AsParallel()?.Select(x => new User(x.Name, x.Url))?.ToArray();
             else
-                users = dataParsUser.users?.Select(x => new User(x.Name, x.Url))?.ToArray();
+                Users = dataParsUser.users?.Select(x => new User(x.Name, x.Url))?.ToArray();
             tableSchedule = new TableScheduleStudents(urlSchedule, typePars);
         }
         [JsonConstructor]
@@ -44,8 +43,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         {
             ((string Name, string Url)[] users, Text Direction, uint YearReceipt, Text Profile) resul = default;
             NameGroup = new string(NameGroup.Where(x => char.IsDigit(x)).ToArray());
-            HtmlDocument htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml((new WebClient()).DownloadString($"https://www.novsu.ru/search/groups/i.2500/?page=search&grpname={NameGroup}"));
+            HtmlDocument htmlDocument = new();
+            htmlDocument.LoadHtml(LoadHtml($"https://www.novsu.ru/search/groups/i.2500/?page=search&grpname={NameGroup}"));
             HtmlNodeCollection htmlNodesHeadsList = htmlDocument.DocumentNode.SelectNodes("//div[@id='npe_instance_2500_npe_content']//ul");
             HtmlNodeCollection htmlNodesUsersList = htmlDocument.DocumentNode.SelectNodes("//div[@id='npe_instance_2500_npe_content']//table[@class='viewtable']");
 
@@ -77,7 +76,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 
                 static (string Direction, string YearReceipt, string Profile) GetGroupInfo(string html)
                 {
-                    HtmlDocument htmlDocument = new HtmlDocument();
+                    HtmlDocument htmlDocument = new();
                     htmlDocument.LoadHtml(html);
                     HtmlNodeCollection htmlNodes = htmlDocument.DocumentNode.SelectNodes("//li");
                     if (htmlNodes.Count >= 4)
@@ -103,8 +102,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         public IEnumerable<object> GetData()
         {
             List<object> resul = new() { tableSchedule };
-            if (users != null)
-                resul.AddRange(users);
+            if (Users != null)
+                resul.AddRange(Users);
             return resul;
         }
         public void SetData(IEnumerable<object> newData) => throw new System.NotImplementedException();

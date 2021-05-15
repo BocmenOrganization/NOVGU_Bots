@@ -7,7 +7,7 @@ using static NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule.Hendler;
 
 namespace NOVGUBots.App.Schedule.Pages
 {
-    public class Schedule : Page
+    public class Schedule : ManagerPageNOVGU.Page
     {
         private static readonly ModelMarkerTextData Message_TextStartMain = new(CretePageSchedule.NameApp, CretePageSchedule.NameTableText, 7);
         public DateTime[] dates;
@@ -22,7 +22,7 @@ namespace NOVGUBots.App.Schedule.Pages
                 ManagerPage.SetBackPage(inBot);
         }
 
-        public override void EventInMessage(ObjectDataMessageInBot inBot) => ResetLastMessenge(inBot);
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot) => ResetLastMessenge(inBot);
 
         public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendDataBot(StaticData.GetSendMessage(inBot, dates));
     }

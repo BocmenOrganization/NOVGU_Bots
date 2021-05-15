@@ -2,18 +2,17 @@
 using BotsCore.Moduls.Tables.Services;
 using BotsCore.Bots.Model.Buttons;
 using System;
-using BotsCore.Moduls.Translate;
 using NOVGUBots.Moduls.NOVGU_SiteData;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using BotsCore;
 using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.BindingNOVGU;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 {
-    public class ConfirmationUser : Page
+    public class ConfirmationUser : ManagerPageNOVGU.Page
     {
+        private const string CharsCode = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
         public const string NamePage = "NovguUser=Регистрация->Подтверждение";
 
         private const string FiledNameDateTime = "DateTime_Page_ConfirmationUser";
@@ -22,7 +21,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
         private const string FiledNameOldEmail = "EmailSend_Page_ConfirmationUser";
         private const int CountCharCode = 6;
         private const uint TimeTesetSend = 120;
-        private static readonly Random random = new Random();
+        private static readonly Random random = new();
 
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 39);
         private static readonly ModelMarkerTextData Message_TextTimeInfo = Message_TextStart.GetElemNewId(40);
@@ -41,6 +40,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
         public bool StatePage;
         private string email;
         public RegisterInfo registerInfo;
+        public string userId;
 
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
         {
@@ -95,15 +95,18 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
                 StatePage = true;
             }
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (StatePage && inBot.MessageText == Code)
             {
+                EventClose(inBot);
                 inBot.User[FiledNameDateTime] = null;
                 inBot.User[FiledNameCode] = null;
                 inBot.User[FiledNameStatePage] = null;
+                inBot.User[FiledNameOldEmail] = null;
                 UserRegister.SetRegisterInfo(registerInfo, inBot);
                 UserRegister.AddFlag(UserRegister.RegisterState.ConnectNovgu, inBot);
+                UserRegister.SetUser(userId, inBot);
                 if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
                 {
                     UserRegister.RemoveFlag(UserRegister.RegisterState.NewUser, inBot);
@@ -131,16 +134,18 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
             EventClose(inBot);
             Start(inBot);
         }
-
-        private static string GenerateRandomCode() => new string(Enumerable.Range(0, CountCharCode + 1).Select(x => (char)random.Next(65, 122)).ToArray());
+        private static string GenerateRandomCode() => new(Enumerable.Range(0, CountCharCode + 1).Select(x => CharsCode[random.Next(0, CharsCode.Length)]).ToArray());
         private Moduls.NOVGU_SiteData.Model.User GetUser(ObjectDataMessageInBot inBot)
         {
+            Moduls.NOVGU_SiteData.Model.User user;
             if (registerInfo.userState == UserRegister.UserState.Student)
             {
-                return DataNOVGU.GetInfoScheduleInstitute(registerInfo.type).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == registerInfo.NameInstituteColleg)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == registerInfo.NameCourse)?.groups?.FirstOrDefault(x => x.Name == registerInfo.NameGroup)?.users?.FirstOrDefault(x => x.IdString == registerInfo.UserId);
+                user = DataNOVGU.GetInfoScheduleInstitute(registerInfo.type).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == registerInfo.NameInstituteColleg)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == registerInfo.NameCourse)?.Groups?.FirstOrDefault(x => x.Name == registerInfo.NameGroup)?.Users?.FirstOrDefault(x => x.IdString == registerInfo.UserId);
             }
             else
-                return DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.IdString == registerInfo.UserId).User;
+                user = DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.IdString == registerInfo.UserId).User;
+            userId = user?.IdString;
+            return user;
         }
     }
 }

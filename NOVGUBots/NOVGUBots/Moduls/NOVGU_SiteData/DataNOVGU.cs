@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Model.SchedulePage;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 
@@ -24,7 +23,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
         public const string NameFileSchedules = "FileSchedules.json";
 
 #pragma warning disable CA2211 // Поля, не являющиеся константами, не должны быть видимыми
-        public static ParalelSetting DefaultParalelSetting = ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course;
+        public static ParalelSetting DefaultParalelSetting = ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Group;
 #pragma warning restore CA2211 // Поля, не являющиеся константами, не должны быть видимыми
 
         private static readonly SchedulePage[] schedules = new SchedulePage[]
@@ -91,26 +90,26 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
             if (File.Exists(PatchFile))
                 (schedules, UserTeachers, Calendar) = JsonConvert.DeserializeObject<(SchedulePage[], UserTeacher[], DateTime[][][])>(File.ReadAllText(PatchFile));
             else
-                LoadNewData(ParalelSetting.PeopleTeacher | ParalelSetting.PeopleGroup | ParalelSetting.Course | ParalelSetting.Institute, NOVGUSetting.langs);
+                LoadNewData(DefaultParalelSetting, NOVGUSetting.langs);
         }
         public static void Start(uint periodUpdate = 1000)
         {
-            timerUpdate?.Stop();
-            timerUpdate = new System.Timers.Timer(periodUpdate);
-            timerUpdate.Elapsed += (sender, e) =>
-            {
-                try
-                {
-                    LoadNewData(DefaultParalelSetting, NOVGUSetting.langs);
-                }
-                catch (Exception ex)
-                {
-                    EchoLog.Print($"При обновлении расписания произошла ошибка: {ex.Message}");
-                }
-                timerUpdate?.Start();
-            };
-            timerUpdate.AutoReset = false;
-            timerUpdate.Start();
+            //timerUpdate?.Stop();
+            //timerUpdate = new System.Timers.Timer(periodUpdate);
+            //timerUpdate.Elapsed += (sender, e) =>
+            //{
+            //    try
+            //    {
+            //        LoadNewData(DefaultParalelSetting, NOVGUSetting.langs);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        EchoLog.Print($"При обновлении расписания произошла ошибка: {ex.Message}");
+            //    }
+            //    timerUpdate?.Start();
+            //};
+            //timerUpdate.AutoReset = false;
+            //timerUpdate.Start();
         }
         public static void LoadNewData(ParalelSetting? paralelSetting, params Lang.LangTypes[] langs)
         {
@@ -122,13 +121,13 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
                 foreach (var item in schedules)
                     item.UpdateData(GetNewData(item), langs);
 
-            List<object> infoUpdate = new List<object>();
-            var NewDataUserTeachers = GetTeachers(new WebClient().DownloadString(UrlTeachers), (ParalelSetting)paralelSetting);
+            List<object> infoUpdate = new();
+            var NewDataUserTeachers = GetTeachers(LoadHtml(UrlTeachers), (ParalelSetting)paralelSetting);
             var OldDataTescher = JsonConvert.DeserializeObject<UserTeacher[]>(JsonConvert.SerializeObject(UserTeachers));
-            var UpdateInfoUserTeachers = IUpdated.Update(NewDataUserTeachers, UserTeachers, ref infoUpdate);
-            if (UpdateInfoUserTeachers.stateUpdated)
+            var (stateUpdated, newData) = IUpdated.Update(NewDataUserTeachers, UserTeachers, ref infoUpdate);
+            if (stateUpdated)
             {
-                UserTeacher[] newdataTeacher = UpdateInfoUserTeachers.newData.Select(x => (UserTeacher)x).ToArray();
+                UserTeacher[] newdataTeacher = newData.Select(x => (UserTeacher)x).ToArray();
                 newdataTeacher.AsParallel().ForAll(x => ((ITranslatable)x).Translate(langs));
                 if (EventUpdateUserTeachers != null)
                 {
@@ -141,21 +140,21 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
                     {
                         EchoLog.Print($"Произошла ошибка при обработки события обновления данных учителей: {e.Message}");
                     }
-                    lock (UserTeachers)
-                    {
-                        UserTeachers = NewDataUserTeachers;
-                    }
+                }
+                lock (UserTeachers)
+                {
+                    UserTeachers = NewDataUserTeachers;
                 }
             }
 
-            Calendar = GetCalendar(new WebClient().DownloadString(UrlCalendar));
+            Calendar = GetCalendar(LoadHtml(UrlCalendar));
 
             if (!Directory.Exists(PatcSaveInfo))
                 Directory.CreateDirectory(PatcSaveInfo);
 
             File.WriteAllText(Path.Combine(PatcSaveInfo, NameFileSchedules), JsonConvert.SerializeObject((schedules, UserTeachers, Calendar), Formatting.Indented));
 
-            InstituteCollege[] GetNewData(SchedulePage schedule) => ParsInstitute(new WebClient().DownloadString(schedule.Url), schedule.TypeInstitute, (Parser.ParalelSetting)paralelSetting);
+            InstituteCollege[] GetNewData(SchedulePage schedule) => ParsInstitute(LoadHtml(schedule.Url), schedule.TypeInstitute, (Parser.ParalelSetting)paralelSetting);
         }
         public static SchedulePage GetInfoScheduleInstitute(TypePars type)
         {
@@ -178,7 +177,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
                     string NameInstituteCollege = UserRegister.GetNameInstituteCollege(user);
                     string NameCourse = UserRegister.GetNameCourse(user);
                     string NameGroup = UserRegister.GetNameGroup(user);
-                    return GetInfoScheduleInstitute(UserRegister.GetTypeSchedule(user)).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)?.groups?.FirstOrDefault(x => x.Name == NameGroup)?.tableSchedule;
+                    return GetInfoScheduleInstitute(UserRegister.GetTypeSchedule(user)).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)?.Groups?.FirstOrDefault(x => x.Name == NameGroup)?.tableSchedule;
                 }
                 else
                 {

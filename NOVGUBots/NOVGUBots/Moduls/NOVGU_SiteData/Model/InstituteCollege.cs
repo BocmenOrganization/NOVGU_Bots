@@ -5,7 +5,6 @@ using System.Linq;
 using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 using Newtonsoft.Json;
-using System;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
 {
@@ -18,13 +17,13 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         [JsonProperty]
         public Course[] Courses { get; private set; }
         [JsonProperty]
-        public TypePars typePars { get; private set; }
+        public TypePars TypePars { get; private set; }
 
         public InstituteCollege(string name, string html, string dopHtml, TypePars typePars, ParalelSetting paralelSetting)
         {
             if (typePars != TypePars.College)
                 Name = new Text(Lang.LangTypes.ru, name);
-            this.typePars = typePars;
+            this.TypePars = typePars;
             var data = LoadData(html, dopHtml, typePars, paralelSetting);
             if (data != null)
             {
@@ -34,7 +33,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
                 if (Name == null && name != null)
                     Name = new Text(Lang.LangTypes.ru, name);
                 Id = data.Value.id;
-                Courses = data.Value.courses?.Where(x => x?.groups != null).ToArray();
+                Courses = data.Value.courses?.Where(x => x?.Groups != null).ToArray();
                 if (Courses != null && Courses.Length == 0)
                     Courses = null;
             }
@@ -167,7 +166,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
             return null;
         }
 
-        public override string ToString() => (typePars == TypePars.College ? $"id-Название: {Id}" : $"Id: {Id}, Название: {Name}") + $" Тип: {typePars}";
+        public override string ToString() => (TypePars == TypePars.College ? $"id-Название: {Id}" : $"Id: {Id}, Название: {Name}") + $" Тип: {TypePars}";
 
         public List<Text> GetTextsTranslate()
         {

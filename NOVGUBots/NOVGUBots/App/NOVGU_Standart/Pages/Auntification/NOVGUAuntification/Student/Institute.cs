@@ -11,7 +11,7 @@ using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Student
 {
-    public class Institute : Page
+    public class Institute : ManagerPageNOVGU.Page
     {
         public const string NamePage = "NovguUser=Регистрация->Студент-1";
         private static readonly ModelMarkerTextData Message_TextStartMainInstitute = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 31);
@@ -23,7 +23,6 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
         {
             registerInfo = RegisterInfo.Load(dataOpenPage);
-            registerInfo.textsHistory = new Text[] { DataNOVGU.GetInfoScheduleInstitute(registerInfo.type).Name };
             Start(inBot);
             ResetLastMessenge(inBot);
         }
@@ -32,7 +31,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         {
             MessageButtons = KitButton.GenerateKitButtonsTexts(DataNOVGU.GetInfoScheduleInstitute(registerInfo.type).Institute?.Select(x => new Text[] { x.Name }).ToArray(), CommandInvoke, 1d);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!MessageButtons.CommandInvoke(inBot))
                 ResetLastMessenge(inBot);
@@ -40,8 +39,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         private void CommandInvoke(ObjectDataMessageInBot inBot, Text text, object data)
         {
             registerInfo.NameInstituteColleg = text.GetDefaultText();
-            Array.Resize(ref registerInfo.textsHistory, registerInfo.textsHistory.Length + 1);
-            registerInfo.textsHistory[registerInfo.textsHistory.Length - 1] = text;
+            registerInfo.textsHistory.Add(text);
             ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Course.NamePage, registerInfo);
         }
 

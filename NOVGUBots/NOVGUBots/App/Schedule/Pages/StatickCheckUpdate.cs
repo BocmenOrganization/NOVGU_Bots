@@ -102,7 +102,7 @@ namespace NOVGUBots.App.Schedule.Pages
 
                 foreach (var Item_instituteCollege in instituteColleges)
                     foreach (var Item_courses in Item_instituteCollege.Courses)
-                        foreach (var Item_group in Item_courses.groups)
+                        foreach (var Item_group in Item_courses.Groups)
                             resul.Add((Item_group.Name, Item_group.tableSchedule.DataTable));
 
                 return resul;

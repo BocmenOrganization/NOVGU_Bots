@@ -1,4 +1,5 @@
-﻿using BotsCore.Moduls.Translate;
+﻿using BotsCore.Moduls.Tables.Services;
+using BotsCore.Moduls.Translate;
 using System.Net;
 using System.Net.Mail;
 
@@ -6,6 +7,8 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 {
     public static class AuthorizationMailing
     {
+        private static readonly ModelMarkerTextData TitleText = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 62);
+        private static readonly ModelMarkerTextData TextMessage = TitleText.GetElemNewId(63);
         private static (string email, string password)[] clientsInfo;
         private static string adressSMPT;
         private static int portSMPT;
@@ -16,8 +19,8 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
         {
             (SmtpClient smtpClient, MailAddress from) = GetClient();
             MailMessage mailMessage = new MailMessage(from, new MailAddress(email, userName));
-            mailMessage.Subject = "...";
-            mailMessage.Body = codeSend;
+            mailMessage.Subject = TitleText.GetText(lang);
+            mailMessage.Body = string.Format(TextMessage.GetText(lang), codeSend);
             mailMessage.IsBodyHtml = true;
             smtpClient.Send(mailMessage);
         }

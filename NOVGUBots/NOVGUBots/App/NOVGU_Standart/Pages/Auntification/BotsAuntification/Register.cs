@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
 {
-    public class Register : Page
+    public class Register : ManagerPageNOVGU.Page
     {
         /// <summary>
         /// Введите логин - 0
@@ -46,7 +46,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
             if (inBot.User.Password == null)
                 inBot.User.Login = null;
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!StateRegister)
             {

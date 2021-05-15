@@ -5,7 +5,6 @@ using NOVGUBots.Moduls.NOVGU_SiteData.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 
 namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
@@ -15,7 +14,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
         private static List<(DateTime[] dates, string, (DateTime[] times, string[] numGroup, Text[] subject, Href[] who, Href[] auditorium, Href[] comment)[])> ParsDayInfo(string url, TypePars typePars)
         {
             HtmlDocument htmlDocument = new();
-            htmlDocument.LoadHtml((new WebClient()).DownloadString(url));
+            htmlDocument.LoadHtml(LoadHtml(url));
             HtmlNodeCollection htmlNodesTable = htmlDocument.DocumentNode.SelectNodes("//table[@class='shedultable']//tr");
             DateTime[] StartEndTime = GetInstituteTimesPeriod(htmlDocument, typePars);
             List<(string, (DateTime[] times, string[] numGroup, Text[] subject, Href[] who, Href[] auditorium, Href[] comment)[])> Days = new();
@@ -146,7 +145,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model.Schedule
         }
         public static DayStudents[] GetDayStudents(string url, TypePars typePars)
         {
-            if (typePars == TypePars.Teacher) throw new ArgumentException();
+            if (typePars == TypePars.Teacher) throw new ArgumentException("Попытка загрузить данные преподователя в структуру данных студента");
             return ParsDayInfo(url, typePars).Select(x =>
             new DayStudents(new Text(Lang.LangTypes.ru, x.Item2), x.dates,
                 x.Item3.Select(x =>

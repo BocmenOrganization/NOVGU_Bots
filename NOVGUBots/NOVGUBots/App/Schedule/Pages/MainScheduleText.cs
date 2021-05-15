@@ -9,7 +9,7 @@ using System.IO;
 
 namespace NOVGUBots.App.Schedule.Pages
 {
-    public class MainScheduleText : Page
+    public class MainScheduleText : ManagerPageNOVGU.Page
     {
         private static readonly ModelMarkerTextData Message_TextStartMain = new(CretePageSchedule.NameApp, CretePageSchedule.NameTableText, 7);
         private static readonly ModelMarkerTextData Message_TextErrorPeriod = Message_TextStartMain.GetElemNewId(9);
@@ -54,7 +54,7 @@ namespace NOVGUBots.App.Schedule.Pages
         }
         private static DateTime[] GeerateDatePeriod(DateTime[] period)
         {
-            List<DateTime> resul = new List<DateTime>() { period.First() };
+            List<DateTime> resul = new() { period.First() };
             while (period.Last().Date > resul.Last().Date)
                 resul.Add(resul.Last().Date.AddDays(1));
             return resul.ToArray();
@@ -69,7 +69,7 @@ namespace NOVGUBots.App.Schedule.Pages
             Period = new DateTime[] { monday, monday.AddDays(6) };
             ResetLastMessenge(inBot);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!dayWeek.CommandInvoke(inBot, Period))
                 ResetLastMessenge(inBot);

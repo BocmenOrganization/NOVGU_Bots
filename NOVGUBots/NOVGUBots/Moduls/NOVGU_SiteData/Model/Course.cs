@@ -12,30 +12,30 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         [JsonProperty]
         public Text Name { get; private set; }
         [JsonProperty]
-        public Group[] groups { get; private set; }
+        public Group[] Groups { get; private set; }
 
         public Course(TypePars typePars, ParalelSetting paralelSetting, string name, params (string nameGroup, string UrlSchedule)[] ps)
         {
             Name = new Text(Lang.LangTypes.ru, name);
             if ((paralelSetting & ParalelSetting.Course) > 0)
-                groups = ps?.AsParallel()?.Select(x => new Group(typePars, paralelSetting, x.nameGroup, x.UrlSchedule))?.ToArray();
+                Groups = ps?.AsParallel()?.Select(x => new Group(typePars, paralelSetting, x.nameGroup, x.UrlSchedule))?.ToArray();
             else
-                groups = ps?.Select(x => new Group(typePars, paralelSetting, x.nameGroup, x.UrlSchedule))?.ToArray();
+                Groups = ps?.Select(x => new Group(typePars, paralelSetting, x.nameGroup, x.UrlSchedule))?.ToArray();
         }
         [JsonConstructor]
         private Course() { }
-        public override string ToString() => $"Название: {Name}, Кол-во групп: {groups.Length}";
+        public override string ToString() => $"Название: {Name}, Кол-во групп: {Groups.Length}";
 
-        public IEnumerable<object> GetData() => groups;
+        public IEnumerable<object> GetData() => Groups;
         public List<Text> GetTextsTranslate()
         {
-            List<Text> texts = new List<Text> { Name };
-            if (groups != null)
-                foreach (var item in groups)
+            List<Text> texts = new() { Name };
+            if (Groups != null)
+                foreach (var item in Groups)
                     texts.AddRange(item.GetTextsTranslate());
             return texts;
         }
-        public void SetData(IEnumerable<object> newData) => groups = newData?.Select(x => (Group)x).ToArray();
+        public void SetData(IEnumerable<object> newData) => Groups = newData?.Select(x => (Group)x).ToArray();
         public bool Similarity(object e)
         {
             if (e is Course course)

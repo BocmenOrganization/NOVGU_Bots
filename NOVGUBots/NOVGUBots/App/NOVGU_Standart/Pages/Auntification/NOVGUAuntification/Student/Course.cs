@@ -10,7 +10,7 @@ using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Student
 {
-    public class Course : Page
+    public class Course : ManagerPageNOVGU.Page
     {
         public const string NamePage = "NovguUser=Регистрация->Студент-2";
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 33);
@@ -32,11 +32,10 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
         private void CommandInvoke(ObjectDataMessageInBot inBot, Text text, object data)
         {
             registerInfo.NameCourse = text.GetDefaultText();
-            Array.Resize(ref registerInfo.textsHistory, registerInfo.textsHistory.Length + 1);
-            registerInfo.textsHistory[registerInfo.textsHistory.Length - 1] = text;
+            registerInfo.textsHistory.Add(text);
             ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Group.NamePage, registerInfo);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!MessageButtons.CommandInvoke(inBot))
                 ResetLastMessenge(inBot);

@@ -61,12 +61,21 @@ namespace NOVGUBots.App.NOVGU_Standart
         }
         public static void SetRegisterInfo(RegisterInfo registerInfo, ModelUser user)
         {
+            if (!(GetInfoRegisterUser(user).HasFlag(RegisterState.ConnectNovgu) &&
+                registerInfo.userState == GetUserState(user) &&
+                registerInfo.type == GetTypeSchedule(user) &&
+                registerInfo.NameInstituteColleg == GetNameInstituteCollege(user) &&
+                registerInfo.NameCourse == GetNameCourse(user) &&
+                registerInfo.NameGroup == GetNameGroup(user)))
+            {
+                SetUser(registerInfo.UserId, user);
+                RemoveFlag(RegisterState.ConnectNovgu, user);
+            }
             SetUserState(registerInfo.userState, user);
             SetTypeSchedule(registerInfo.type, user);
             SetNameInstituteCollege(registerInfo.NameInstituteColleg, user);
             SetNameCourse(registerInfo.NameCourse, user);
             SetNameGroup(registerInfo.NameGroup, user);
-            SetUser(registerInfo.UserId, user);
         }
         [Flags]
         public enum RegisterState : uint

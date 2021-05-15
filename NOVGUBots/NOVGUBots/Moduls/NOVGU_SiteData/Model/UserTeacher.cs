@@ -33,7 +33,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData.Model
         public void SetData(IEnumerable<object> newData) => Schedule = newData.Select(x => (DayTeacher)x).ToArray();
         public List<Text> GetTextsTranslate()
         {
-            List<Text> texts = new List<Text>();
+            List<Text> texts = new();
             if (Schedule!= null)
                 foreach (var elem in Schedule)
                     texts.AddRange(elem.GetTextsTranslate());

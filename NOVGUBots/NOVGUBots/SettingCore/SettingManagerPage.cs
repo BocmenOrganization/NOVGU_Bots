@@ -14,6 +14,7 @@ namespace NOVGUBots.SettingCore
     public class SettingManagerPage : ISettingManagerPage
     {
         private static readonly ModelMarkerTextData textSetButtons = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 0);
+        public static readonly ModelMarkerTextData textGetHelpPage = textSetButtons.GetElemNewId(68);
         private static readonly CommandList commandListNewUser;
         private static readonly CommandList commandList;
         private static readonly KitButton buttonsDefaut;
@@ -21,19 +22,29 @@ namespace NOVGUBots.SettingCore
         static SettingManagerPage()
         {
             ModelMarkerTextData ButtonTextBack = textSetButtons.GetElemNewId(10);
-            ObjectCommand backPage = new ObjectCommand((inBot, degreeSimilarity, data) => { ManagerPage.SetBackPage(inBot); return true; }, ButtonTextBack);
-            ObjectCommand GetKeyboard = new ObjectCommand((inBot, degreeSimilarity, data) =>
+            ObjectCommand backPage = new((inBot, degreeSimilarity, data) => 
+            {
+                if (!(inBot.BotUser[ManagerPageNOVGU.Page.NameAppData, ManagerPageNOVGU.Page.NamePageData] is bool stateHelpOpened && stateHelpOpened))
+                    ManagerPage.SetBackPage(inBot);
+                else
+                {
+                    inBot.BotUser[ManagerPageNOVGU.Page.NameAppData, ManagerPageNOVGU.Page.NamePageData] = false;
+                    ManagerPage.ResetSendLastMessage(inBot);
+                }
+                return true; 
+            }, ButtonTextBack);
+            ObjectCommand GetKeyboard = new((inBot, degreeSimilarity, data) =>
             {
                 if (UserRegister.GetInfoRegisterUser(inBot).HasFlag(UserRegister.RegisterState.NewUser))
                 {
-                    ManagerPage.SendDataBot(new ObjectDataMessageSend(inBot) { ButtonsKeyboard = App.NOVGU_Standart.Pages.PageStart.ButtonMessage_NewUser }, false, ManagerPage.GetPageUser(inBot));
+                    ManagerPage.SendDataBot(new(inBot) { ButtonsKeyboard = App.NOVGU_Standart.Pages.PageStart.ButtonMessage_NewUser }, false, ManagerPage.GetPageUser(inBot));
                 }
                 else
                     ManagerPage.ResetSendKeyboard(inBot);
                 ManagerPage.ResetSendLastMessage(inBot);
                 return true;
             }, "/keyboard");
-            ObjectCommand GetLastMessage = new ObjectCommand((inBot, degreeSimilarity, data) => { ManagerPage.ResetSendLastMessage(inBot); return true; }, "/lastmessage"); ;
+            ObjectCommand GetLastMessage = new((inBot, degreeSimilarity, data) => { ManagerPage.ResetSendLastMessage(inBot); return true; }, "/lastmessage");
 
             commandList = new CommandList(new ObjectCommand[]
             {
@@ -58,6 +69,7 @@ namespace NOVGUBots.SettingCore
                 },
                 new Button[]
                 {
+                    new Button(textGetHelpPage, (inBot, degreeSimilarity, data) => { return true; }),
                     new Button(ButtonTextBack, Ocommand: null)
                 },
             });

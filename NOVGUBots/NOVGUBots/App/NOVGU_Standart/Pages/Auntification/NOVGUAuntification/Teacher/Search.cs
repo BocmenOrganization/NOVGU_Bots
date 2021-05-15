@@ -7,10 +7,11 @@ using NOVGUBots.Moduls.NOVGU_SiteData;
 using System.Linq;
 using BotsCore;
 using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.BindingNOVGU;
+using System.Collections.Generic;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Teacher
 {
-    public class Search : Page
+    public class Search : ManagerPageNOVGU.Page
     {
         public const string NamePage = "NovguUser=Регистрация->Преподователь";
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 43);
@@ -28,7 +29,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Te
         {
             SearchUserDataChar(NameUser);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!searchUsersButton?.CommandInvoke(inBot) ?? true)
             {
@@ -61,7 +62,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Te
         private void CommandInvoke(ObjectDataMessageInBot inBot, string text, object data)
         {
             registerInfo.UserId = DataNOVGU.UserTeachers?.FirstOrDefault(x => x.User.Name == text).User.IdString;
-            registerInfo.textsHistory = new Text[] { new Text(inBot, text) };
+            registerInfo.textsHistory = new List<Text> { new Text(inBot, text) { LockTranslator = true } };
             IsConfirmationUser.SetNextPageStudentOrTeacer(inBot, 1, registerInfo);
         }
 

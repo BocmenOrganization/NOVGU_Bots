@@ -9,7 +9,7 @@ using System;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
 {
-    public class Entry : Page
+    public class Entry : ManagerPageNOVGU.Page
     {
         /// <summary>
         /// Введите логин - 0
@@ -43,7 +43,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.BotsAuntification
         public string Login;
 
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage) => ResetLastMessenge(inBot);
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!StateAuntification)
             {

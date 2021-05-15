@@ -7,10 +7,11 @@ using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 using BotsCore;
 using BotsCore.Moduls.Translate;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Student
 {
-    public class Main : Page
+    public class Main : ManagerPageNOVGU.Page
     {
         public const string NamePage = "NovguUser=Регистрация->Студент-0";
         public static readonly ModelMarkerStringlData StrPatch = new ModelMarkerStringlData(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableString, 3);
@@ -25,37 +26,36 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
             {
                 new Button[]
                 {
-                    new Button(DataNOVGU.InstituteFullTime.Name, (inBot, s, data) => { SetType(inBot, TypePars.InstituteFullTime, data); return true; })
+                    new Button(DataNOVGU.InstituteFullTime.Name, (inBot, s, data) => { SetType(inBot, TypePars.InstituteFullTime); return true; })
                 },
                 new Button[]
                 {
-                    new Button(DataNOVGU.InstituteInAbsentia.Name, (inBot, s, data) => { SetType(inBot, TypePars.InstituteInAbsentia, data); return true; })
+                    new Button(DataNOVGU.InstituteInAbsentia.Name, (inBot, s, data) => { SetType(inBot, TypePars.InstituteInAbsentia); return true; })
                 },
                 new Button[]
                 {
-                    new Button(DataNOVGU.College.Name, (inBot, s, data) => { SetType(inBot, TypePars.College, data); return true; })
+                    new Button(DataNOVGU.College.Name, (inBot, s, data) => { SetType(inBot, TypePars.College); return true; })
                 }
             });
-            static void SetType(ObjectDataMessageInBot inBot, TypePars type, object e)
+            static void SetType(ObjectDataMessageInBot inBot, TypePars type)
             {
-                BindingNOVGU.RegisterInfo registerInfo = BindingNOVGU.RegisterInfo.Load(e);
+                BindingNOVGU.RegisterInfo registerInfo = new();
                 registerInfo.type = type;
+                registerInfo.textsHistory = new List<Text> { DataNOVGU.GetInfoScheduleInstitute(type).Name };
                 ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, Institute.NamePage, registerInfo);
             }
         }
-        public BindingNOVGU.RegisterInfo registerInfo;
         public override void EventOpen(ObjectDataMessageInBot inBot, Type oldPage, object dataOpenPage)
         {
-            registerInfo = BindingNOVGU.RegisterInfo.Load(dataOpenPage);
             SendMessage(inBot);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
-            if (!kitButton.CommandInvoke(inBot, registerInfo))
+            if (!kitButton.CommandInvoke(inBot))
                 SendMessage(inBot);
         }
         public override void ResetLastMessenge(ObjectDataMessageInBot inBot) => SendMessage(inBot);
         private void SendMessage(ObjectDataMessageInBot inBot) => SendDataBot(new ObjectDataMessageSend(inBot) { TextObj = Message_TextStartMain, ButtonsMessage = kitButton });
-        public static string GetTextMainFormat(Text[] history, string Adddata, Lang.LangTypes langTypes) => string.Format(FormatPatch, history != null ? string.Join(StrPatch, history.Select(x => x.GetText(langTypes))) : string.Empty, Adddata);
+        public static string GetTextMainFormat(List<Text> history, string Adddata, Lang.LangTypes langTypes) => string.Format(FormatPatch, history != null ? string.Join(StrPatch, history.Select(x => x.GetText(langTypes))) : string.Empty, Adddata);
     }
 }

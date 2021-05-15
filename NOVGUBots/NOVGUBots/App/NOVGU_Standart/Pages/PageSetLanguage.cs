@@ -8,10 +8,14 @@ using BotsCore.Moduls.Tables.Interface;
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages
 {
-    public class PageSetLanguage : Page
+    public class PageSetLanguage : ManagerPageNOVGU.Page
     {
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 11);
         private static readonly KitButton Button_MessageLangsList;
+        public static readonly ModelMarkerStringlData ButtonTextRu = new ModelMarkerStringlData(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableString, 0);
+        public static readonly ModelMarkerStringlData ButtonTextEn = ButtonTextRu.GetElemNewId(1);
+        public static readonly ModelMarkerStringlData ButtonTextDe = ButtonTextRu.GetElemNewId(2);
+
         static PageSetLanguage()
         {
             ITableString tableTextButtons = (ITableString)GlobalTableManager.GetTable(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableString);
@@ -19,15 +23,15 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
             {
                 new Button[]
                 {
-                    new Button(tableTextButtons.GetDataTextId(0), (inBot, s, data) => { SetLang(inBot, Lang.LangTypes.ru, data); return true; }),
+                    new Button(ButtonTextRu, (inBot, s, data) => { SetLang(inBot, Lang.LangTypes.ru, data); return true; }),
                 },
                 new Button[]
                 {
-                    new Button(tableTextButtons.GetDataTextId(1), (inBot, s, data) => { SetLang(inBot, Lang.LangTypes.en, data); return true; }),
+                    new Button(ButtonTextEn, (inBot, s, data) => { SetLang(inBot, Lang.LangTypes.en, data); return true; }),
                 },
                 new Button[]
                 {
-                    new Button(tableTextButtons.GetDataTextId(2), (inBot, s, data) => { SetLang(inBot, Lang.LangTypes.de, data); return true; })
+                    new Button(ButtonTextDe, (inBot, s, data) => { SetLang(inBot, Lang.LangTypes.de, data); return true; })
                 }
             });
             static void SetLang(ObjectDataMessageInBot inBot, Lang.LangTypes lang, object data)
@@ -60,7 +64,7 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages
         {
             SendMessage(inBot);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!Button_MessageLangsList.CommandInvoke(inBot))
                 SendMessage(inBot);

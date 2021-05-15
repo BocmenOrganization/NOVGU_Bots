@@ -10,7 +10,7 @@ using static NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification
 
 namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.Student
 {
-    public class User : Page
+    public class User : ManagerPageNOVGU.Page
     {
         public const string NamePage = "NovguUser=Регистрация->Студент-4";
         private static readonly ModelMarkerTextData Message_TextStart = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 35);
@@ -34,16 +34,15 @@ namespace NOVGUBots.App.NOVGU_Standart.Pages.Auntification.NOVGUAuntification.St
             string NameInstituteCollege = UserRegister.GetNameInstituteCollege(inBot);
             string NameCourse = UserRegister.GetNameCourse(inBot);
             string NameGroup = UserRegister.GetNameGroup(inBot);
-            return IsConfirmationUser.FilterUsers(DataNOVGU.GetInfoScheduleInstitute(UserRegister.GetTypeSchedule(inBot)).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)?.groups?.FirstOrDefault(x => x.Name == NameGroup)?.users);
+            return IsConfirmationUser.FilterUsers(DataNOVGU.GetInfoScheduleInstitute(UserRegister.GetTypeSchedule(inBot)).Institute?.FirstOrDefault(x => x.Name.GetDefaultText() == NameInstituteCollege)?.Courses?.FirstOrDefault(x => x.Name.GetDefaultText() == NameCourse)?.Groups?.FirstOrDefault(x => x.Name == NameGroup)?.Users);
         }
         private void CommandInvoke(ObjectDataMessageInBot inBot, string text, object data)
         {
             registerInfo.UserId = GetUsers(inBot).FirstOrDefault(x => x.Name == text)?.IdString;
-            Array.Resize(ref registerInfo.textsHistory, registerInfo.textsHistory.Length + 1);
-            registerInfo.textsHistory[registerInfo.textsHistory.Length - 1] = new Text(inBot, text);
+            registerInfo.textsHistory.Add(new Text(inBot, text) { LockTranslator = true });
             ManagerPage.SetPageSaveHistory(inBot, CreatePageAppStandart.NameApp, ConfirmationUser.NamePage, registerInfo);
         }
-        public override void EventInMessage(ObjectDataMessageInBot inBot)
+        public override void EventInMessageNOVGU(ObjectDataMessageInBot inBot)
         {
             if (!MessageButtons.CommandInvoke(inBot))
                 ResetLastMessenge(inBot);
