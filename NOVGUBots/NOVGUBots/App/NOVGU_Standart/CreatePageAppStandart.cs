@@ -52,7 +52,8 @@ namespace NOVGUBots.App.NOVGU_Standart
         {
             (NameApp, NamePage_SetLanguage, ButtonName_SetLanguage),
             (NameApp, NamePage_RegisterMain, ButtonName_SetLanguage.GetElemNewId(47)),
-            (NameApp, BindingNOVGU.NamePage, ButtonName_SetLanguage.GetElemNewId(48))
+            (NameApp, BindingNOVGU.NamePage, ButtonName_SetLanguage.GetElemNewId(48)),
+            (NameApp, PageBotInfo.NamePage, ButtonName_SetLanguage.GetElemNewId(74))
         };
 
         public string GetNameApp() => NameApp;
@@ -76,6 +77,7 @@ namespace NOVGUBots.App.NOVGU_Standart
                 Pages.Auntification.NOVGUAuntification.IsConfirmationUser.NamePage => new Pages.Auntification.NOVGUAuntification.IsConfirmationUser(),
                 Pages.Auntification.NOVGUAuntification.ConfirmationUser.NamePage => new Pages.Auntification.NOVGUAuntification.ConfirmationUser(),
                 Pages.Auntification.NOVGUAuntification.Teacher.Search.NamePage => new Pages.Auntification.NOVGUAuntification.Teacher.Search(),
+                PageBotInfo.NamePage => new PageBotInfo(),
                 _ => null,
             };
         }
@@ -100,6 +102,7 @@ namespace NOVGUBots.App.NOVGU_Standart
                 Pages.Auntification.NOVGUAuntification.IsConfirmationUser.NamePage => typeof(Pages.Auntification.NOVGUAuntification.IsConfirmationUser),
                 Pages.Auntification.NOVGUAuntification.ConfirmationUser.NamePage => typeof(Pages.Auntification.NOVGUAuntification.ConfirmationUser),
                 Pages.Auntification.NOVGUAuntification.Teacher.Search.NamePage => typeof(Pages.Auntification.NOVGUAuntification.Teacher.Search),
+                PageBotInfo.NamePage => typeof(PageBotInfo),
                 _ => null,
             };
         }
@@ -144,7 +147,7 @@ namespace NOVGUBots.App.NOVGU_Standart
             string[] texts = new string[]
             {
                 string.Format(WeatherTemperature.GetText(inBot), ExternalEnvironment.TempFeelsLike),
-                string.Format(WeatherHumidity.GetText(inBot), ExternalEnvironment.Humidity),
+                string.Format(WeatherHumidity.GetText(inBot), ExternalEnvironment.Humidity * 100),
                 string.Format(WeatherWindSpeed.GetText(inBot), ExternalEnvironment.WindSpeed)
             };
             return new (string title, string[] texts)[] { (string.Format(TitleWeather.GetText(inBot), getWeatherEmoji()), texts) };

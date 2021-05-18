@@ -15,7 +15,7 @@ namespace NOVGUBots.ManagerPageNOVGU
         {
             private static readonly ModelMarkerUneversalData<Media[]> modelMarkerMedia = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableMedia, 4);
             private static readonly ModelMarkerTextData NamePage = new(CreatePageAppStandart.NameApp, CreatePageAppStandart.NameTableText, 61);
-            private static readonly ModelMarkerTextData TextInfoTimeUpdate = NamePage.GetElemNewId(60);
+            public static readonly ModelMarkerTextData TextInfoTimeUpdate = NamePage.GetElemNewId(60);
             private static readonly ModelMarkerTextData TextHelpPage = NamePage.GetElemNewId(70);
             private static readonly TimeSpan myZero = TimeSpan.Parse("23:59:59");
 
@@ -47,7 +47,7 @@ namespace NOVGUBots.ManagerPageNOVGU
                 //if (timeSpanNow < ExternalEnvironment.blueHourMorning.start && timeSpanNow > ExternalEnvironment.blueHourNight.end)// Ночь
 
                 if (ExternalEnvironment.blueHourNight.end > TimeSpan.Zero ? 
-                    ((timeSpanNow < myZero && timeSpanNow > ExternalEnvironment.blueHourNight.end) || (timeSpanNow > TimeSpan.Zero && timeSpanNow < ExternalEnvironment.blueHourNight.start)) 
+                    ((timeSpanNow < myZero && timeSpanNow > ExternalEnvironment.blueHourNight.end) || (timeSpanNow > TimeSpan.Zero && timeSpanNow < ExternalEnvironment.blueHourMorning.start)) 
                     : ExternalEnvironment.blueHourNight.end > timeSpanNow && timeSpanNow < ExternalEnvironment.blueHourMorning.start) // Ночь
                     resul = modelMarkerMedia.GetData()[0];
                 else if (timeSpanNow > ExternalEnvironment.blueHourMorning.start && timeSpanNow <= ExternalEnvironment.blueHourMorning.end)// Синий час утром

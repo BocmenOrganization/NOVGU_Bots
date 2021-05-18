@@ -38,6 +38,8 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
         public static Update EventUpdateUserTeachers { get; set; }
         public static DateTime[][][] Calendar { get; private set; }
 
+        public static DateTime datetimeUpdatedInf { get; private set; }
+
         /// <summary>
         /// Очников (институт)
         /// </summary>
@@ -88,7 +90,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
 
             string PatchFile = Path.Combine(PatcSaveInfo, NameFileSchedules);
             if (File.Exists(PatchFile))
-                (schedules, UserTeachers, Calendar) = JsonConvert.DeserializeObject<(SchedulePage[], UserTeacher[], DateTime[][][])>(File.ReadAllText(PatchFile));
+                (datetimeUpdatedInf, schedules, UserTeachers, Calendar) = JsonConvert.DeserializeObject<(DateTime ,SchedulePage[], UserTeacher[], DateTime[][][])>(File.ReadAllText(PatchFile));
             else
                 LoadNewData(DefaultParalelSetting, NOVGUSetting.langs);
         }
@@ -149,10 +151,12 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
 
             Calendar = GetCalendar(LoadHtml(UrlCalendar));
 
+            datetimeUpdatedInf = DateTime.Now;
+
             if (!Directory.Exists(PatcSaveInfo))
                 Directory.CreateDirectory(PatcSaveInfo);
 
-            File.WriteAllText(Path.Combine(PatcSaveInfo, NameFileSchedules), JsonConvert.SerializeObject((schedules, UserTeachers, Calendar), Formatting.Indented));
+            File.WriteAllText(Path.Combine(PatcSaveInfo, NameFileSchedules), JsonConvert.SerializeObject((datetimeUpdatedInf, schedules, UserTeachers, Calendar), Formatting.Indented));
 
             InstituteCollege[] GetNewData(SchedulePage schedule) => ParsInstitute(LoadHtml(schedule.Url), schedule.TypeInstitute, (Parser.ParalelSetting)paralelSetting);
         }

@@ -231,7 +231,7 @@ namespace NOVGUBots.App.Schedule.Pages
             if (lineTeacher == null) return null;
             List<string> linesRes = new();
             if (lineTeacher.TimeStartEnd != null && lineTeacher.TimeStartEnd.Any())
-                linesRes.Add($"{Emoji_time}{lineTeacher.TimeStartEnd.First():hh\\:mm}-{lineTeacher.TimeStartEnd.Last():hh\\:mm}");
+                linesRes.Add($"{Emoji_time}{lineTeacher.TimeStartEnd.First():hh\\:mm}-{new TimeSpan(lineTeacher.TimeStartEnd.Last().Hours, 45, 0):hh\\:mm}");
             if (lineTeacher.Who != null && lineTeacher.Who.Any())
                 linesRes.AddRange(lineTeacher.Who.Where(x => x != null).Select(x => $"{EmojiWho} {generateUrlText?.Invoke(x, inBot) ?? x.Text.GetText(inBot)}"));
             if (lineTeacher.Auditorium != null && lineTeacher.Auditorium.Any())

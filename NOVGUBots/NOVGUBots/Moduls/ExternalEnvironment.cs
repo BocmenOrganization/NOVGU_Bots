@@ -13,11 +13,13 @@ namespace NOVGUBots.Moduls
         private const string Token_openweathermap = "759726268b72dc806df14e82adb2d218";
         private const uint KoofFaringate = 273;
         // ==================================================================================== Данные освещённости времени суток
+        public static DateTime DateTimeUpdatedSunPosition { get; private set; }
         public static (TimeSpan start, TimeSpan end) blueHourMorning { get; private set; }
         public static (TimeSpan start, TimeSpan end) goldenHourMorning { get; private set; }
         public static (TimeSpan start, TimeSpan end) goldenHourNight { get; private set; }
         public static (TimeSpan start, TimeSpan end) blueHourNight { get; private set; }
         // ==================================================================================== Данные о погоде
+        public static DateTime DateTimeUpdatedWeather { get; private set; }
         /// <summary>
         /// Текущая температура, в °C
         /// </summary>
@@ -77,6 +79,7 @@ namespace NOVGUBots.Moduls
             goldenHourMorning = GetDates("goldenHourMorning");
             goldenHourNight = GetDates("goldenHourNight");
             blueHourNight = GetDates("blueHourNight");
+            DateTimeUpdatedSunPosition = DateTime.Now;
             timerUpdateSunPosition.Interval = GetTimerPeriod();
             timerUpdateSunPosition.Start();
             (TimeSpan start, TimeSpan end) GetDates(string id)
@@ -98,6 +101,7 @@ namespace NOVGUBots.Moduls
                 Humidity = objJson.main.humidity / 100f;
                 WindSpeed = objJson.wind.speed;
                 Clouds = objJson.clouds.all / 100f;
+                DateTimeUpdatedWeather = DateTime.Now;
             }
             catch(Exception e) { EchoLog.Print($"Не удалось получить данные о погоде: {e.Message}", EchoLog.PrivilegeLog.Warning); }
         }

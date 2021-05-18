@@ -2,9 +2,6 @@
 using BotsCore.Moduls.Tables.Services;
 using BotsCore.Bots.Model.Buttons;
 using BotsCore;
-using static BotsCore.Bots.Model.ObjectDataMessageSend;
-using System.Threading.Tasks;
-using System.Linq;
 using System;
 using static NOVGUBots.Moduls.NOVGU_SiteData.Parser;
 using BotsCore.Moduls.Translate;
