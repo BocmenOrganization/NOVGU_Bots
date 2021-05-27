@@ -42,7 +42,8 @@ namespace NOVGUBots
         private static readonly object[] apps = new object[]
         {
             new CreatePageAppStandart(),
-            new App.Schedule.CretePageSchedule()
+            new App.Schedule.CretePageSchedule(),
+            new App.Helper.CretePageHelper()
         };
         public static void Main()
         {
@@ -95,9 +96,12 @@ namespace NOVGUBots
                 new ModelTableText(CreatePageAppStandart.NameTableText, NOVGUSetting.langs),
                 new ModelTableUniversal<Media[]>(CreatePageAppStandart.NameTableMedia),
                 new ModelTableString(CreatePageAppStandart.NameTableString),
+
                 new ModelTableText(App.Schedule.CretePageSchedule.NameTableText),
                 new ModelTableUniversal<Media[]>(App.Schedule.CretePageSchedule.NameTableMedia),
-                new ModelTableString(App.Schedule.CretePageSchedule.NameTableString)
+                new ModelTableString(App.Schedule.CretePageSchedule.NameTableString),
+
+                new ModelTableText(App.Helper.CretePageHelper.NameTableText)
             };
             standartTables = new ModelUpdateTablesInternet
                 (
@@ -107,7 +111,8 @@ namespace NOVGUBots
                 tables
                 );
             GlobalTableManager.AddTables(CreatePageAppStandart.NameApp, tables.Take(3).ToArray());
-            GlobalTableManager.AddTables(App.Schedule.CretePageSchedule.NameApp, tables.Skip(3).ToArray());
+            GlobalTableManager.AddTables(App.Schedule.CretePageSchedule.NameApp, tables.Skip(3).Take(3).ToArray());
+            GlobalTableManager.AddTables(App.Helper.CretePageHelper.NameApp, tables.Skip(6).ToArray());
         }
         private static void LoadBots()
         {

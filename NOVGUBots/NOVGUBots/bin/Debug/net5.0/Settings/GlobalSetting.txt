@@ -69,7 +69,7 @@ ManagerUser_PathFileSetting=>Settings\SettingUser.txt;
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Bots Telegram ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 
-BotsTelegram_ListBots=>[{"Item1":"Telegram","Item2":"1657650627:AAEjwPyQzsJ3WCmtd6bYD-jqIKvwT3iHfRg"}];
+BotsTelegram_ListBots=>[{"Item1":"Telegram","Item2":"1814505333:AAHp8fMnoXPiMf5fQ9HWOmrmQsOALIiDL3w"}];
 
 # ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Maling ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 

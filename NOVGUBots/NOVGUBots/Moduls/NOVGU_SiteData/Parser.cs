@@ -85,7 +85,7 @@ namespace NOVGUBots.Moduls.NOVGU_SiteData
         rest:
             try
             {
-                HttpClient client = new();
+                using HttpClient client = new();
                 using HttpResponseMessage response = client.GetAsync(Url).Result;
                 using HttpContent content = response.Content;
                 return content.ReadAsStringAsync().Result;
